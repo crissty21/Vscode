@@ -14,6 +14,7 @@ switchSeconds.addEventListener('change', function () {
     player.focus();
 });
 
+	
 document.addEventListener('DOMContentLoaded', function () {
 
     // Add quick commands
