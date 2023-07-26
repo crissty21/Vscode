@@ -21,19 +21,44 @@
         To view this video, please enable JavaScript or use a browser that supports HTML5 video.
       </p>
     </video>
-    <!-- Button for forward frames -->
-    <div class="frame-buttons">
-      <button onclick="forwardFrames(-1)">Backward</button>
-      <button onclick="forwardFrames(1)">Forward</button>
+    <div class="button-container">
+      <div class="frame-skip skip-div">
+        <!-- Button for forward frames -->
+        <div class="frame-buttons">
+          <button onclick="forwardFrames(-1)">Frames Backward</button>
+          <button onclick="forwardFrames(1)">Frames Forward</button>
+        </div>
+        <!-- Selector for step size -->
+        <div class="frame-selector selector">
+          <button onclick="updateStep(-1)">&lt;</button>
+          <span id="current-step">1</span>
+          <button onclick="updateStep(1)">&gt;</button>
+        </div>
+      </div>
+
+      <label class="switch">
+        <input type="checkbox" checked id="switchSeconds">
+        <span class="slider round"></span>
+      </label>
+
+      <div class="seconds-skip skip-div">
+        <!-- Button for forward frames -->
+        <div class="seconds-buttons">
+          <button onclick="forwardSeconds(-1)">Seconds Backward</button>
+          <button onclick="forwardSeconds(1)">Seconds Forward</button>
+        </div>
+        <!-- Selector for step size -->
+        <div class="seconds-selector selector">
+          <button onclick="updateSeconds(-1)">&lt;</button>
+          <span id="current-seconds">1</span>
+          <button onclick="updateSeconds(1)">&gt;</button>
+        </div>
+      </div>
     </div>
-    <!-- Selector for step size -->
-    <div class="frame-selector">
-      <button onclick="updateStep(-1)">&lt;</button>
-      <span id="current-step">1</span>
-      <button onclick="updateStep(1)">&gt;</button>
-    </div>
+
+    <button id="capture-btn">Capture Frame</button>
   </div>
- 
+
   <script src="javascript.js"></script>
 </body>
 

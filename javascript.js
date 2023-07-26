@@ -1,6 +1,18 @@
 var currentStep = 1;
+var currentSeconds = 1;
 var player = videojs('my-video');
 var fps = 30;
+var switchSeconds = document.getElementById("switchSeconds");
+var bUpdateSeconds = true;
+
+switchSeconds.addEventListener('change', function () {
+    if (switchSeconds.checked) {
+        bUpdateSeconds = true;
+    } else {
+        bUpdateSeconds = false;
+    }
+    player.focus();
+});
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -29,24 +41,49 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         this.on('keydown', function (event) {
-            // Skip 5 seconds backward when left arrow is pressed
             if (event.which === 37) {
-                forwardFrames(-1);
+                if (bUpdateSeconds) {
+                    forwardSeconds(-1);
+                }
+                else {
+                    forwardFrames(-1);
+                }
             }
-            // Skip 5 seconds forward when right arrow is pressed
             if (event.which === 39) {
-                forwardFrames(1);
+                if (bUpdateSeconds) {
+                    forwardSeconds(1);
+                }
+                else {
+                    forwardFrames(1);
+                }
             }
         });
-        
+
         this.on('keydown', function (event) {
             // Add frames when up arrow is pressed 
             if (event.which === 38) {
-                updateStep(1);
+                if (bUpdateSeconds) {
+                    updateSeconds(1);
+                }
+                else {
+                    updateStep(1);
+                }
             }
             // Subtract frames when down arrow is pressed 
             if (event.which === 40) {
-                updateStep(-1);
+                if (bUpdateSeconds) {
+                    updateSeconds(-1);
+                }
+                else {
+                    updateStep(-1);
+                }
+            }
+        });
+
+        this.on('keydown', function (event) {
+            if (event.which === 83) {
+                bUpdateSeconds = !bUpdateSeconds;
+                switchSeconds.checked = bUpdateSeconds;
             }
         });
     });
@@ -56,8 +93,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function forwardFrames(direction) {
     player.pause();
     var currentTime = player.currentTime();
-    var newTime = currentTime + this.currentStep * 1 / fps * direction;
+    var newTime = currentTime + this.currentStep / fps * direction;
     player.currentTime(newTime);
+    player.focus();
+
 }
 
 // Function to update the step size based on the selected option
@@ -66,4 +105,25 @@ function updateStep(step) {
         currentStep += step;
         document.getElementById('current-step').textContent = currentStep;
     }
+    player.focus();
+
+}
+// Function to forward or backward seconds
+function forwardSeconds(direction) {
+    player.pause();
+    var currentTime = player.currentTime();
+    var newTime = currentTime + this.currentSeconds * direction;
+    player.currentTime(newTime);
+    player.focus();
+
+}
+
+// Function to update the step size based on the selected option
+function updateSeconds(step) {
+    if (currentSeconds + step != 0) {
+        currentSeconds += step;
+        document.getElementById('current-seconds').textContent = currentSeconds;
+    }
+    player.focus();
+
 }
