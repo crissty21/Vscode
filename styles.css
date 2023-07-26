@@ -2,30 +2,56 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #98caf2;
-    padding-top: 50px;
+    background-color: #f0f0f0;
+    padding: 20px 50px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
 }
+
+#video-background {
+    padding: 10px;
+    border: 5px solid #007BFF;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
 .button-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #adf4af;
+    background-color: #f6f6f6;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    padding: 0px 5px;
 }
 
-button {
+
+.button-container button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
+    background-color: #007BFF;
+    color: #fff;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.button-container button:hover {
+    background-color: #0056b3;
+}
+
 
 .selector {
     margin-top: 10px;
-    text-align: center;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .selector span {
@@ -33,22 +59,13 @@ button {
     font-size: 18px;
 }
 
-.seconds-selector{
-    display: flex;
-    justify-content: right;
-}
-.mp4-file-selector{
-    background-color: #79ae83;
-}
-
 .switch {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 34px;
-    margin: 50px;
-    background-color: #aa98f2;
-
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .switch input {
@@ -69,11 +86,6 @@ button {
     transition: .4s;
 }
 
-.skip-div{
-    background-color: #f2ea98;
-
-}
-
 .slider:before {
     position: absolute;
     content: "";
@@ -87,11 +99,11 @@ button {
 }
 
 input:checked+.slider {
-    background-color: #2196F3;
+    background-color: #007BFF;
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #007BFF;
 }
 
 input:checked+.slider:before {
@@ -100,7 +112,7 @@ input:checked+.slider:before {
     transform: translateX(26px);
 }
 
-/* Rounded sliders */
+
 .slider.round {
     border-radius: 34px;
 }
@@ -109,7 +121,16 @@ input:checked+.slider:before {
     border-radius: 50%;
 }
 
-/* Styles for the container */
+
+.skip-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 10px;
+}
+
 .mp4-file-selector {
     display: flex;
     flex-direction: column;
@@ -119,18 +140,17 @@ input:checked+.slider:before {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background-color: #f9f9f9;
+    background-color: #f6f6f6;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Styles for the paragraph */
-  .mp4-file-selector p {
+}
+
+.mp4-file-selector p {
     font-size: 16px;
     margin: 10px 0;
-  }
-  
-  /* Styles for the file input */
-  .mp4-file-selector input[type="file"] {
+}
+
+
+.mp4-file-selector input[type="file"] {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -140,5 +160,4 @@ input:checked+.slider:before {
     outline: none;
     width: 100%;
     max-width: 300px;
-  }
-  
+}

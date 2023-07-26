@@ -13,26 +13,36 @@
 
 <body>
   <div class="video-container">
-    <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360">
-      <!-- Video source -->
-      <source src="mp4file.mp4" type="video/mp4">
-      <!-- Fallback source for browsers that don't support HTML5 video -->
-      <p class="vjs-no-js">
-        To view this video, please enable JavaScript or use a browser that supports HTML5 video.
-      </p>
-    </video>
+    <div id="video-background">
+
+      <video id="my-video"
+             class="video-js vjs-big-play-centered" 
+             controls preload="auto" 
+             width="640" 
+             height="360">
+        
+        <source src="mp4file.mp4" type="video/mp4">
+        <p class="vjs-no-js">
+          To view this video, please enable JavaScript or use a browser that supports HTML5 video.
+        </p>
+      </video>
+    </div>
     <div class="button-container">
       <div class="frame-skip skip-div">
-        <!-- Button for forward frames -->
+        
         <div class="frame-buttons">
           <button onclick="forwardFrames(-1)">Frames Backward</button>
           <button onclick="forwardFrames(1)">Frames Forward</button>
         </div>
-        <!-- Selector for step size -->
-        <div class="frame-selector selector">
+        
+        <div class="frame-selector selector" 
+             onmousemove="enableScroll(1)"
+             onmouseleave="disableScroll()">
+
           <button onclick="updateStep(-1)">&lt;</button>
           <span id="current-step">1</span>
           <button onclick="updateStep(1)">&gt;</button>
+
           <span>&larr; Number of frames</span>
         </div>
       </div>
@@ -43,19 +53,22 @@
       </label>
 
       <div class="seconds-skip skip-div">
-        <!-- Button for forward frames -->
+
         <div class="seconds-buttons">
           <button onclick="forwardSeconds(-1)">Seconds Backward</button>
           <button onclick="forwardSeconds(1)">Seconds Forward</button>
-        </div>
-        <!-- Selector for step size -->
-        <div class="seconds-selector selector">
+        </div> 
+        
+        <div class="seconds-selector selector" 
+             onmousemove="enableScroll(2)" 
+             onmouseleave="disableScroll()">
+
           <span>Number of seconds &rarr;</span>
+
           <button onclick="updateSeconds(-1)">&lt;</button>
           <span id="current-seconds">1</span>
           <button onclick="updateSeconds(1)">&gt;</button>
         </div>
-
       </div>
     </div>
     <div class="mp4-file-selector">

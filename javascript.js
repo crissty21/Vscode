@@ -4,6 +4,8 @@ var player = videojs('my-video');
 var fps = 30;
 var switchSeconds = document.getElementById("switchSeconds");
 var bUpdateSeconds = true;
+var scrollEnabled = false;
+var scrollType = 1;
 
 switchSeconds.addEventListener('change', function () {
     if (switchSeconds.checked) {
@@ -14,10 +16,9 @@ switchSeconds.addEventListener('change', function () {
     player.focus();
 });
 
-	
+
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Add quick commands
     player.ready(function () {
         // Play/Pause with Space key
         this.on('keydown', function (event) {
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Skip number of frames/seconds
         this.on('keydown', function (event) {
             if (event.which === 37) {
                 if (bUpdateSeconds) {
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         this.on('keydown', function (event) {
-            // Add frames when up arrow is pressed 
+            // Add frames/seconds when up arrow is pressed 
             if (event.which === 38) {
                 if (bUpdateSeconds) {
                     updateSeconds(1);
@@ -70,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateStep(1);
                 }
             }
-            // Subtract frames when down arrow is pressed 
+            // Subtract frames/seconds when down arrow is pressed 
             if (event.which === 40) {
                 if (bUpdateSeconds) {
                     updateSeconds(-1);
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Switch between frames and seconds using 's'
         this.on('keydown', function (event) {
             if (event.which === 83) {
                 bUpdateSeconds = !bUpdateSeconds;
@@ -100,7 +103,7 @@ function forwardFrames(direction) {
 
 }
 
-// Function to update the step size based on the selected option
+// Function to update the step size 
 function updateStep(step) {
     if (currentStep + step != 0) {
         currentStep += step;
@@ -119,7 +122,7 @@ function forwardSeconds(direction) {
 
 }
 
-// Function to update the step size based on the selected option
+// Function to update the seconds size based
 function updateSeconds(step) {
     if (currentSeconds + step != 0) {
         currentSeconds += step;
@@ -129,7 +132,28 @@ function updateSeconds(step) {
 
 }
 
-document.getElementById('files').addEventListener('change', function(event){
+document.getElementById('files').addEventListener('change', function (event) {
     var file = event.target.files[0];
-    player.src({ type: "video/mp4", src: URL.createObjectURL(file)});
+    player.src({ type: "video/mp4", src: URL.createObjectURL(file) });
 }, false);
+
+function enableScroll(type) {
+    scrollEnabled = true;
+    scrollType = type;
+}
+
+function disableScroll() {
+    scrollEnabled = false;
+}
+
+document.addEventListener('wheel', (event) => {
+    if (scrollEnabled) {
+        const delta = -Math.sign(event.deltaY);
+        if (scrollType == 1) {
+            updateStep(delta);
+        }
+        else {
+            updateSeconds(delta);
+        }
+    }
+});
