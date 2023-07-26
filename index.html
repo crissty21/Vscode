@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Playback with Video.js</title>
+  <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet">
+  <script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script>
+  <!-- CSS styles for buttons -->
+  <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="video-container">
+    <video id="my-video" class="video-js" controls preload="auto" width="640" height="360" data-setup="{}">
+      <!-- Video source -->
+      <source src="mp4file.mp4" type="video/mp4">
+      <!-- Fallback source for browsers that don't support HTML5 video -->
+      <p class="vjs-no-js">
+        To view this video, please enable JavaScript or use a browser that supports HTML5 video.
+      </p>
+    </video>
+    <!-- Button for forward frames -->
+    <div class="frame-buttons">
+      <button onclick="forwardFrames(-1)">Backward</button>
+      <button onclick="forwardFrames(1)">Forward</button>
+    </div>
+    <!-- Selector for step size -->
+    <div class="frame-selector">
+      <button onclick="updateStep(-1)">&lt;</button>
+      <span id="current-step">1</span>
+      <button onclick="updateStep(1)">&gt;</button>
+    </div>
+  </div>
+ 
+  <script src="javascript.js"></script>
+</body>
+
+</html>
