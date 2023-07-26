@@ -13,7 +13,7 @@
 
 <body>
   <div class="video-container">
-    <video id="my-video" class="video-js" controls preload="auto" width="640" height="360" data-setup="{}">
+    <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360">
       <!-- Video source -->
       <source src="mp4file.mp4" type="video/mp4">
       <!-- Fallback source for browsers that don't support HTML5 video -->
@@ -33,6 +33,7 @@
           <button onclick="updateStep(-1)">&lt;</button>
           <span id="current-step">1</span>
           <button onclick="updateStep(1)">&gt;</button>
+          <span>&larr; Number of frames</span>
         </div>
       </div>
 
@@ -49,14 +50,18 @@
         </div>
         <!-- Selector for step size -->
         <div class="seconds-selector selector">
+          <span>Number of seconds &rarr;</span>
           <button onclick="updateSeconds(-1)">&lt;</button>
           <span id="current-seconds">1</span>
           <button onclick="updateSeconds(1)">&gt;</button>
         </div>
+
       </div>
     </div>
-
-    <button id="capture-btn">Capture Frame</button>
+    <div class="mp4-file-selector">
+      <p>Choose another mp4 file:</p>
+      <input type="file" id="files" name="files[]" accept="video/mp4" />
+    </div>
   </div>
 
   <script src="javascript.js"></script>

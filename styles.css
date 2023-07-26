@@ -37,6 +37,9 @@ button {
     display: flex;
     justify-content: right;
 }
+.mp4-file-selector{
+    background-color: #79ae83;
+}
 
 .switch {
     position: relative;
@@ -105,3 +108,37 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+/* Styles for the container */
+.mp4-file-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Styles for the paragraph */
+  .mp4-file-selector p {
+    font-size: 16px;
+    margin: 10px 0;
+  }
+  
+  /* Styles for the file input */
+  .mp4-file-selector input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    max-width: 300px;
+  }
+  

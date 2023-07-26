@@ -128,3 +128,8 @@ function updateSeconds(step) {
     player.focus();
 
 }
+
+document.getElementById('files').addEventListener('change', function(event){
+    var file = event.target.files[0];
+    player.src({ type: "video/mp4", src: URL.createObjectURL(file)});
+}, false);
