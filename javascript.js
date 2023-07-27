@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 switchSeconds.checked = bUpdateSeconds;
             }
         });
+
     });
 });
 
@@ -151,7 +152,6 @@ function disableScroll() {
 }
 
 document.addEventListener('wheel', (event) => {
-    event.preventDefault();
     if (scrollEnabled) {
         const delta = -Math.sign(event.deltaY);
         if (scrollType == 1) {
@@ -163,36 +163,48 @@ document.addEventListener('wheel', (event) => {
     }
 });
 
-var videoId = 'my-video';
-var scaleFactor = 0.25;
-var snapshots = [];
 
-
-function capture(video, scaleFactor) {
-    if (scaleFactor == null) {
-        scaleFactor = 1;
-    }
-    var w = video.videoWidth * scaleFactor;
-    var h = video.videoHeight * scaleFactor;
+function shoot() {
+    player.pause();
+    var video = player.el().querySelector('video');
+    var w = video.videoWidth;
+    var h = video.videoHeight;
     var canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
+
     var ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, w, h);
-    return canvas;
+
+    openModal(canvas);
 }
 
 
-function shoot() {
-    var video = player.el().querySelector('video');
-    var output = document.getElementById('output');
-    var canvas = capture(video, scaleFactor);
-    canvas.onclick = function () {
-        window.open(this.toDataURL(image / jpg));
-    };
-    snapshots.unshift(canvas);
-    output.innerHTML = '';
-    for (var i = 0; i < 4; i++) {
-        output.appendChild(snapshots[i]);
+    function openModal(canvas) {
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContent = document.getElementById('modal-content');
+        const modalImage = document.getElementById('modal-image');
+    
+        modalOverlay.style.display = 'block';
+        
+        
+        modalImage.innerHTML = "";
+        modalImage.appendChild(canvas);
     }
+
+
+function closeModal() {
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.style.display = 'none';
+
 }
+
+const modalClose = document.getElementById('modal-close');
+modalClose.onclick = closeModal;
+
+window.onclick = function (event) {
+    const modalOverlay = document.getElementById('modal-overlay');
+    if (event.target === modalOverlay) {
+        closeModal();
+    }
+};
