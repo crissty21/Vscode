@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Skip number of frames/seconds
         this.on('keydown', function (event) {
             if (event.which === 37) {
+                event.preventDefault();
                 if (bUpdateSeconds) {
                     forwardSeconds(-1);
                 }
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             if (event.which === 39) {
+                event.preventDefault();
                 if (bUpdateSeconds) {
                     forwardSeconds(1);
                 }
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.on('keydown', function (event) {
             // Add frames/seconds when up arrow is pressed 
             if (event.which === 38) {
+                event.preventDefault();
                 if (bUpdateSeconds) {
                     updateSeconds(1);
                 }
@@ -74,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             // Subtract frames/seconds when down arrow is pressed 
             if (event.which === 40) {
+                event.preventDefault();
                 if (bUpdateSeconds) {
                     updateSeconds(-1);
                 }
@@ -147,6 +151,7 @@ function disableScroll() {
 }
 
 document.addEventListener('wheel', (event) => {
+    event.preventDefault();
     if (scrollEnabled) {
         const delta = -Math.sign(event.deltaY);
         if (scrollType == 1) {
