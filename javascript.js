@@ -1,3 +1,4 @@
+
 var currentStep = 1;
 var currentSeconds = 1;
 var player = videojs('my-video');
@@ -18,10 +19,10 @@ switchSeconds.addEventListener('change', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-
     player.ready(function () {
         // Play/Pause with Space key
         this.on('keydown', function (event) {
+            alert("DA");
             if (event.which === 32) {
                 if (this.paused()) {
                     this.play();
@@ -162,5 +163,4 @@ document.addEventListener('wheel', (event) => {
         }
     }
 });
-
 
