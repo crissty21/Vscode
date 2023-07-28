@@ -424,4 +424,4 @@ function snapshot(options) {
 	container.on('mouseleave', finish);
 }
 
-videojs.registerPlugin('snapshot', snapshot);
+videojs.plugin('snapshot', snapshot);

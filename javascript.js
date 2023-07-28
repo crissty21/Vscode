@@ -8,14 +8,7 @@ var bUpdateSeconds = true;
 var scrollEnabled = false;
 var scrollType = 1;
 
-switchSeconds.addEventListener('change', function () {
-    if (switchSeconds.checked) {
-        bUpdateSeconds = true;
-    } else {
-        bUpdateSeconds = false;
-    }
-    player.focus();
-});
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -98,7 +91,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 });
-
+switchSeconds.addEventListener('change', function () {
+    if (switchSeconds.checked) {
+        bUpdateSeconds = true;
+    } else {
+        bUpdateSeconds = false;
+    }
+    player.focus();
+});
 // Function to forward or backward frames
 function forwardFrames(direction) {
     player.pause();
