@@ -1,92 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Playback with Video.js</title>
-  <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet">
-  <script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script>
-  <!-- CSS styles for buttons -->
-  <link href="styles.css" rel="stylesheet">
+	<meta charset="utf-8">
+
+	<title>Video.js | HTML5 Video Player</title>
+
+	<link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+	<script src="http://vjs.zencdn.net/4.12/video.js"></script>
+
+	<link href="./build/videojs-snapshot.css" rel="stylesheet" type="text/css" />
+	<script src="./build/videojs-snapshot.js"></script>
+
+	<link href="styles.css" rel="stylesheet">
+
 </head>
 
 <body>
-  <div class="video-container">
-    <div id="video-background">
 
-      <video id="my-video"
-             class="video-js vjs-big-play-centered" 
-             controls preload="auto" 
-             width="640" 
-             height="360">
-        
-        <source src="mp4file.mp4" type="video/mp4">
-        <p class="vjs-no-js">
-          To view this video, please enable JavaScript or use a browser that supports HTML5 video.
-        </p>
-      </video>
-    </div>
-    <button id="snapshot-button" onclick="shoot()" class="button">Take Snapshot</button>
-    <div class="button-container">
-      <div class="frame-skip skip-div">
-        
-        <div class="frame-buttons">
-          <button onclick="forwardFrames(-1)">Frames Backward</button>
-          <button onclick="forwardFrames(1)">Frames Forward</button>
-        </div>
-        
-        <div class="frame-selector selector" 
-             onmousemove="enableScroll(1)"
-             onmouseleave="disableScroll()">
 
-          <button onclick="updateStep(-1)">&lt;</button>
-          <span id="current-step">1</span>
-          <button onclick="updateStep(1)">&gt;</button>
+	<div class="video-container">
+		<div id="video-background">
 
-          <span>&larr; Number of frames</span>
-        </div>
-      </div>
+			<video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls"
+				preload="auto" width="640" height="480">
+				<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
+					browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5
+						video</a></p>
+			</video>
+		</div>
+		<div class="button-container">
+			<div class="frame-skip skip-div">
 
-      <label class="switch">
-        <input type="checkbox" checked id="switchSeconds">
-        <span class="slider round"></span>
-      </label>
+				<div class="frame-buttons">
+					<button onclick="forwardFrames(-1)">Frames Backward</button>
+					<button onclick="forwardFrames(1)">Frames Forward</button>
+				</div>
 
-      <div class="seconds-skip skip-div">
+				<div class="frame-selector selector" onmousemove="enableScroll(1)" onmouseleave="disableScroll()">
 
-        <div class="seconds-buttons">
-          <button onclick="forwardSeconds(-1)">Seconds Backward</button>
-          <button onclick="forwardSeconds(1)">Seconds Forward</button>
-        </div> 
-        
-        <div class="seconds-selector selector" 
-             onmousemove="enableScroll(2)" 
-             onmouseleave="disableScroll()">
+					<button onclick="updateStep(-1)">&lt;</button>
+					<span id="current-step">1</span>
+					<button onclick="updateStep(1)">&gt;</button>
 
-          <span>Number of seconds &rarr;</span>
+					<span>&larr; Number of frames</span>
+				</div>
+			</div>
 
-          <button onclick="updateSeconds(-1)">&lt;</button>
-          <span id="current-seconds">1</span>
-          <button onclick="updateSeconds(1)">&gt;</button>
-        </div>
-      </div>
-    </div>
-    <div class="mp4-file-selector">
-      <p>Choose another mp4 file:</p>
-      <input type="file" id="files" name="files[]" accept="video/mp4" />
-    </div>
-   
-    <div id="modal-overlay">
-      <div id="modal-content">
-        <span id="modal-close">&times;</span>
-        <div id="modal-image">
-      </div>
-    </div>
-  </div>
-  
+			<label class="switch">
+				<input type="checkbox" checked id="switchSeconds">
+				<span class="slider round"></span>
+			</label>
 
-  <script src="javascript.js"></script>
+			<div class="seconds-skip skip-div">
+
+				<div class="seconds-buttons">
+					<button onclick="forwardSeconds(-1)">Seconds Backward</button>
+					<button onclick="forwardSeconds(1)">Seconds Forward</button>
+				</div>
+
+				<div class="seconds-selector selector" onmousemove="enableScroll(2)" onmouseleave="disableScroll()">
+
+					<span>Number of seconds &rarr;</span>
+
+					<button onclick="updateSeconds(-1)">&lt;</button>
+					<span id="current-seconds">1</span>
+					<button onclick="updateSeconds(1)">&gt;</button>
+				</div>
+			</div>
+		</div>
+		<div class="mp4-file-selector">
+			<p>Choose mp4 file:</p>
+			<input type="file" id="files" name="files[]" accept="video/mp4" />
+		</div>
+
+
+
+
+
+
+
+	</div>
+
+
+	
+	<script>
+		var player = videojs('my-video');
+		player.snapshot();
+		</script>
+	<script src="javascript.js"></script>
+
+	<style>
+	</style>
+
+
 </body>
 
 </html>
