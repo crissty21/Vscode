@@ -2,11 +2,7 @@ function snapshot(options) {
 	var player = this;
 	var video = player.el().querySelector('video');
 	var container, scale;
-	//FIXME: add some kind of assert for video, if flash is used it's not working
-
-	//TODO: add better prefix for all new css class, probably vjs-snapshot
-	//TODO: break this large file up into smaller ones, e.g. container, ...
-	//TODO: make it possible to drag boxes also from bottom right to top left
+	
 
 	function updateScale(){
 		var rect = video.getBoundingClientRect();
@@ -428,4 +424,4 @@ function snapshot(options) {
 	container.on('mouseleave', finish);
 }
 
-videojs.plugin('snapshot', snapshot);
+videojs.registerPlugin('snapshot', snapshot);
