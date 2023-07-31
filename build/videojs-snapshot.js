@@ -40,6 +40,7 @@ function snapshot(options) {
 		canvas_bg.el().style.maxWidth = rect.width + "px";
 		canvas_bg.el().style.maxHeight = rect.height + "px";
 	};
+
 	// camera icon on normal player control bar
 	var snap_btn = player.controlBar.addChild('button');
 	snap_btn.addClass("vjs-snapshot-button");
@@ -47,7 +48,6 @@ function snapshot(options) {
 	snap_btn.on('click', player.snap);
 
 	// drawing controls
-
 	// add canvas parent container before draw control bar, so bar gets on top
 	var parent = player.addChild(
 		new videojs.Component(player, {
@@ -117,6 +117,7 @@ function snapshot(options) {
 	var brush = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "brush", title: "freehand drawing" }));
 	brush.addClass("vjs-tool-active");
 	var rect = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "rect", title: "draw rectangle" }));
+	var arrow = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "arrow", title: "draw arrow" }));
 	var crop = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "crop", title: "select area and click selection to crop" }));
 	var text = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "text", title: "select area, type message and then click somewhere else" }));
 	var eraser = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "eraser", title: "erase drawing in clicked location" }));
@@ -208,13 +209,14 @@ function snapshot(options) {
 			}),
 		})
 	);
-	var canvas_bg = container.addChild( //FIXME: it's quite silly to use a component here
+	var canvas_bg = container.addChild(
 		new videojs.Component(player, {
 			el: videojs.Component.prototype.createEl('canvas', {
 			}),
 		})
 	);
 	var context_bg = canvas_bg.el().getContext("2d");
+
 	var canvas_draw = container.addChild(
 		new videojs.Component(player, {
 			el: videojs.Component.prototype.createEl('canvas', {
@@ -222,6 +224,7 @@ function snapshot(options) {
 		})
 	);
 	var context_draw = canvas_draw.el().getContext("2d");
+
 	var canvas_rect = container.addChild(
 		new videojs.Component(player, {
 			el: videojs.Component.prototype.createEl('canvas', {
@@ -230,6 +233,16 @@ function snapshot(options) {
 	);
 	canvas_rect.el().style.zIndex = "1"; // always on top of other canvas elements
 	var context_rect = canvas_rect.el().getContext("2d");
+
+	var canvas_arrow = container.addChild(
+		new videojs.Component(player, {
+			el: videojs.Component.prototype.createEl('canvas', {
+			}),
+		})
+	);
+	var context_arrow = canvas_arrow.el().getContext("2d");
+
+
 	var cropbox = container.addChild(
 		new videojs.Component(player, {
 			el: videojs.Component.prototype.createEl('div', {
@@ -303,10 +316,31 @@ function snapshot(options) {
 
 	parent.hide();
 	canvas_rect.hide();
+	canvas_arrow.hide();
 	cropbox.hide();
 	textbox.hide();
 
+	// Function to draw an arrow from (startX, startY) to (endX, endY)
+	function drawArrow(context, startX, startY, endX, endY) {
+		context.beginPath();
+		context.moveTo(startX, startY);
+		context.lineTo(endX, endY);
 
+		// Arrowhead properties
+		var arrowSize = 10;
+		var angle = Math.atan2(endY - startY, endX - startX);
+		var arrowEndX = endX - arrowSize * Math.cos(angle - Math.PI / 6);
+		var arrowEndY = endY - arrowSize * Math.sin(angle - Math.PI / 6);
+		var arrowStartX = endX - arrowSize * Math.cos(angle + Math.PI / 6);
+		var arrowStartY = endY - arrowSize * Math.sin(angle + Math.PI / 6);
+
+		// Draw arrowhead
+		context.moveTo(endX, endY);
+		context.lineTo(arrowEndX, arrowEndY);
+		context.moveTo(endX, endY);
+		context.lineTo(arrowStartX, arrowStartY);
+		context.stroke();
+	}
 
 	var paint = false;
 	var startX, startY, currentX, currentY;
@@ -333,6 +367,12 @@ function snapshot(options) {
 				canvas_rect.el().style.left = (startX < currentX ? startX : currentX) + "px";
 				canvas_rect.el().style.top = (startY < currentY ? startY : currentY) + "px";
 				canvas_rect.show();
+				break;
+			case "arrow":
+				canvas_arrow.el().width = canvas_bg.el().width;
+				canvas_arrow.el().height = canvas_bg.el().height;
+				canvas_arrow.show();
+				drawArrow(context_arrow, startX, startY, currentX, currentY);
 				break;
 			case "crop":
 				cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
@@ -388,6 +428,12 @@ function snapshot(options) {
 					context_rect.lineWidth = size.el().value / scale;
 					context_rect.strokeRect(0, 0, canvas_rect.el().width, canvas_rect.el().height);
 					break;
+				case "arrow":
+					context_arrow.clearRect(0, 0, context_arrow.canvas.width, context_arrow.canvas.height);
+					context_arrow.strokeStyle = color.el().value;
+					context_arrow.lineWidth = size.el().value / scale / 2;
+					drawArrow(context_arrow, startX, startY, currentX, currentY);
+					break;
 				case "crop":
 					cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
 					cropbox.el().style.height = Math.abs(currentY - startY) + "px";
@@ -418,7 +464,13 @@ function snapshot(options) {
 					scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
 					scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
 				canvas_rect.hide();
-			} else if (tool == "text") {
+			}
+			else if(tool == "arrow")
+			{
+				drawArrow(context_draw, startX, startY, currentX, currentY);
+				canvas_arrow.hide();
+			}
+			else if (tool == "text") {
 				player.el().blur();
 				textbox.el().focus();
 			}
