@@ -1,4 +1,4 @@
-function snapshot(options) {
+function snapshot() {
 	var player = this;
 	var video = player.el().querySelector('video');
 	var container, scale;
@@ -327,7 +327,7 @@ function snapshot(options) {
 		context.lineTo(endX, endY);
 
 		// Arrowhead properties
-		var arrowSize = 10;
+		var arrowSize = size.el().value / scale * 10;
 		var angle = Math.atan2(endY - startY, endX - startX);
 		var arrowEndX = endX - arrowSize * Math.cos(angle - Math.PI / 6);
 		var arrowEndY = endY - arrowSize * Math.sin(angle - Math.PI / 6);
@@ -356,8 +356,8 @@ function snapshot(options) {
 		switch (tool) {
 			case "brush":
 				context_draw.beginPath();
-				context_draw.moveTo(startX, startY);
-				context_draw.lineTo(currentX, currentY);
+				context_draw.moveTo(startX * scale, startY * scale);
+				context_draw.lineTo(currentX * scale, currentY * scale);
 				context_draw.stroke();
 				break;
 			case "rect":
@@ -369,8 +369,8 @@ function snapshot(options) {
 				canvas_rect.show();
 				break;
 			case "arrow":
-				canvas_arrow.el().width = canvas_bg.el().width;
-				canvas_arrow.el().height = canvas_bg.el().height;
+				canvas_arrow.el().width = canvas_draw.el().width;
+				canvas_arrow.el().height = canvas_draw.el().height;
 				canvas_arrow.show();
 				drawArrow(context_arrow, startX, startY, currentX, currentY);
 				break;
@@ -467,7 +467,7 @@ function snapshot(options) {
 			}
 			else if(tool == "arrow")
 			{
-				drawArrow(context_draw, startX, startY, currentX, currentY);
+				drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 				canvas_arrow.hide();
 			}
 			else if (tool == "text") {
