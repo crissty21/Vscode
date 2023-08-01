@@ -25,13 +25,21 @@ function snapshot() {
 		context_draw.strokeStyle = color.el().value;
 		context_draw.lineWidth = size.el().value / 2;
 		context_draw.lineCap = "round";
+		
+		canvas_arrow.el().width = video.videoWidth;
+		canvas_arrow.el().height = video.videoHeight;
+		context_arrow.strokeStyle = color.el().value;
+		context_arrow.lineWidth = size.el().value / 2;
+		context_arrow.lineCap = "square";
 		// calculate scale
 		updateScale();
-
+		
 		// background canvas containing snapshot from video
 		canvas_bg.el().width = video.videoWidth;
 		canvas_bg.el().height = video.videoHeight;
+		
 		context_bg.drawImage(video, 0, 0);
+		
 
 		// still fit into player element
 		var rect = video.getBoundingClientRect(); // use bounding rect instead of player.width/height because of fullscreen
@@ -39,6 +47,8 @@ function snapshot() {
 		canvas_draw.el().style.maxHeight = rect.height + "px";
 		canvas_bg.el().style.maxWidth = rect.width + "px";
 		canvas_bg.el().style.maxHeight = rect.height + "px";
+		canvas_arrow.el().style.maxWidth = rect.width + "px";
+		canvas_arrow.el().style.maxHeight = rect.height + "px";
 	};
 
 	// camera icon on normal player control bar
@@ -77,6 +87,7 @@ function snapshot() {
 	);
 	color.on('change', function (e) {
 		context_draw.strokeStyle = color.el().value;
+		context_arrow.strokeStyle = color.el().value;
 	});
 
 	// choose size, used everywhere: line width, text size
@@ -92,6 +103,7 @@ function snapshot() {
 	});
 	size.on('change', function (e) {
 		context_draw.lineWidth = size.el().value / 2;
+		context_arrow.lineWidth = size.el().value /2;
 	});
 
 	var tool = 'brush';
@@ -115,12 +127,12 @@ function snapshot() {
 		}
 	});
 	var brush = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "brush", title: "freehand drawing" }));
-	brush.addClass("vjs-tool-active");
 	var rect = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "rect", title: "draw rectangle" }));
 	var arrow = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "arrow", title: "draw arrow" }));
 	var crop = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "crop", title: "select area and click selection to crop" }));
 	var text = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "text", title: "select area, type message and then click somewhere else" }));
 	var eraser = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "eraser", title: "erase drawing in clicked location" }));
+	brush.addClass("vjs-tool-active"); 
 
 	var scaler = drawCtrl.addChild(
 		new videojs.Component(player, {
@@ -323,11 +335,12 @@ function snapshot() {
 	// Function to draw an arrow from (startX, startY) to (endX, endY)
 	function drawArrow(context, startX, startY, endX, endY) {
 		context.beginPath();
+		context.lineCap = "square";
 		context.moveTo(startX, startY);
 		context.lineTo(endX, endY);
 
 		// Arrowhead properties
-		var arrowSize = size.el().value / scale * 10;
+		var arrowSize = size.el().value / scale * 4;
 		var angle = Math.atan2(endY - startY, endX - startX);
 		var arrowEndX = endX - arrowSize * Math.cos(angle - Math.PI / 6);
 		var arrowEndY = endY - arrowSize * Math.sin(angle - Math.PI / 6);
@@ -369,10 +382,8 @@ function snapshot() {
 				canvas_rect.show();
 				break;
 			case "arrow":
-				canvas_arrow.el().width = canvas_draw.el().width;
-				canvas_arrow.el().height = canvas_draw.el().height;
+				
 				canvas_arrow.show();
-				drawArrow(context_arrow, startX, startY, currentX, currentY);
 				break;
 			case "crop":
 				cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
@@ -430,9 +441,7 @@ function snapshot() {
 					break;
 				case "arrow":
 					context_arrow.clearRect(0, 0, context_arrow.canvas.width, context_arrow.canvas.height);
-					context_arrow.strokeStyle = color.el().value;
-					context_arrow.lineWidth = size.el().value / scale / 2;
-					drawArrow(context_arrow, startX, startY, currentX, currentY);
+					drawArrow(context_arrow, startX*scale, startY*scale, currentX*scale, currentY*scale);
 					break;
 				case "crop":
 					cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
@@ -467,7 +476,7 @@ function snapshot() {
 			}
 			else if(tool == "arrow")
 			{
-				drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
+				drawArrow(context_draw, startX*scale, startY*scale, currentX*scale, currentY*scale);
 				canvas_arrow.hide();
 			}
 			else if (tool == "text") {
