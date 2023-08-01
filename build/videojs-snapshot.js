@@ -2,17 +2,47 @@ function snapshot() {
 	var player = this;
 	var video = player.el().querySelector('video');
 	var container, scale;
+	var tool = 'brush';
+	var drawCtrl, parent;
+	var colorButton, sizeButton;
+	var scale_txt;
+	var canvas_bg, context_bg;
+	var canvas_draw, context_draw;
+	var context_rect, canvas_rect;
+	var canvas_arrow, context_arrow;
+	var cropbox, textbox;
+	var paint = false;
+	var startX, startY, currentX, currentY;
 
+	player.snap = snap;
+	
+	createBase();
+	createColorButton();
+	createSizeButton();
+	createToolsButtons();
+	createScalerButton();
+	createJpegPngButton();
+	createCloseButton();
+	createScaleText();
+	createBackgroundCanvas();
+	createDrawCanvas();
+	createRectangleCanvas();
+	createArrowCanvas();
+	drawCropbox();
+	drawTextbox();
 
-	function updateScale() {
-		var rect = video.getBoundingClientRect();
-		var scalew = canvas_draw.el().width / rect.width;
-		var scaleh = canvas_draw.el().height / rect.height;
-		scale = Math.max(Math.max(scalew, scaleh), 1);
-		scale_txt.el().innerHTML = (Math.round(1 / scale * 100) / 100) + "x";
-	}
+	parent.hide();
+	canvas_rect.hide();
+	canvas_arrow.hide();
+	cropbox.hide();
+	textbox.hide();
 
-	player.snap = function () {
+	container.on('mousedown', function (e) { drawClick(e) });
+	container.on('mousemove', function (e) { mouseMove(e) });
+	container.on('mouseup', finish);
+	container.on('mouseleave', finish);
+
+	function snap() {
 		player.pause();
 		player.el().blur();
 		player.controlBar.hide();
@@ -22,24 +52,24 @@ function snapshot() {
 		// canvas for drawing, it's separate from snapshot because of delete
 		canvas_draw.el().width = video.videoWidth;
 		canvas_draw.el().height = video.videoHeight;
-		context_draw.strokeStyle = color.el().value;
-		context_draw.lineWidth = size.el().value / 2;
+		context_draw.strokeStyle = colorButton.el().value;
+		context_draw.lineWidth = sizeButton.el().value / 2;
 		context_draw.lineCap = "round";
-		
+
 		canvas_arrow.el().width = video.videoWidth;
 		canvas_arrow.el().height = video.videoHeight;
-		context_arrow.strokeStyle = color.el().value;
-		context_arrow.lineWidth = size.el().value / 2;
+		context_arrow.strokeStyle = colorButton.el().value;
+		context_arrow.lineWidth = sizeButton.el().value / 2;
 		context_arrow.lineCap = "square";
 		// calculate scale
 		updateScale();
-		
+
 		// background canvas containing snapshot from video
 		canvas_bg.el().width = video.videoWidth;
 		canvas_bg.el().height = video.videoHeight;
-		
+
 		context_bg.drawImage(video, 0, 0);
-		
+
 
 		// still fit into player element
 		var rect = video.getBoundingClientRect(); // use bounding rect instead of player.width/height because of fullscreen
@@ -49,64 +79,26 @@ function snapshot() {
 		canvas_bg.el().style.maxHeight = rect.height + "px";
 		canvas_arrow.el().style.maxWidth = rect.width + "px";
 		canvas_arrow.el().style.maxHeight = rect.height + "px";
-	};
+	}
 
-	// camera icon on normal player control bar
-	var snap_btn = player.controlBar.addChild('button');
-	snap_btn.addClass("vjs-snapshot-button");
-	snap_btn.el().title = "Take snapshot";
-	snap_btn.on('click', player.snap);
+	function updateScale() {
+		var rect = video.getBoundingClientRect();
+		var scalew = canvas_draw.el().width / rect.width;
+		var scaleh = canvas_draw.el().height / rect.height;
+		scale = Math.max(Math.max(scalew, scaleh), 1);
+		scale_txt.el().innerHTML = (Math.round(1 / scale * 100) / 100) + "x";
+	}
 
-	// drawing controls
-	// add canvas parent container before draw control bar, so bar gets on top
-	var parent = player.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-canvas-parent' /*TODO*/
-			}),
-		})
-	);
+	function createToolsButtons() {
+		var brush = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "brush", title: "freehand drawing" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "rect", title: "draw rectangle" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "arrow", title: "draw arrow" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "crop", title: "select area and click selection to crop" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "text", title: "select area, type message and then click somewhere else" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "eraser", title: "erase drawing in clicked location" }));
+		brush.addClass("vjs-tool-active");
+	}
 
-	//draw control bar
-	var drawCtrl = player.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-control-bar vjs-drawing-ctrl',
-			}),
-		})
-	);
-	drawCtrl.hide();
-
-	// choose color, used everywhere: painting, border color of cropbox, ...
-	var color = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('input', {
-				className: 'vjs-control', type: 'color', value: '#df4b26', title: 'color'
-			}),
-		})
-	);
-	color.on('change', function (e) {
-		context_draw.strokeStyle = color.el().value;
-		context_arrow.strokeStyle = color.el().value;
-	});
-
-	// choose size, used everywhere: line width, text size
-	var size = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('input', {
-				className: 'vjs-control', type: 'number', value: '10', title: 'line width, text size, ...'
-			}),
-		})
-	);
-	size.on('keydown', function (e) { // don't fire player shortcuts when size input has focus
-		e.stopPropagation();
-	});
-	size.on('change', function (e) {
-		context_draw.lineWidth = size.el().value / 2;
-		context_arrow.lineWidth = size.el().value /2;
-	});
-
-	var tool = 'brush';
 	function toolChange(event) {
 		var active_tool = drawCtrl.el().querySelector('.vjs-tool-active');
 		active_tool.classList.remove('vjs-tool-active');
@@ -115,49 +107,6 @@ function snapshot() {
 		// always hide cropbox, textbox is hidden automatically as it blurs
 		cropbox.hide();
 	}
-	videojs.ToolButton = videojs.Button.extend({
-		init: function (p, options) {
-			videojs.Button.call(this, p, options);
-
-			this.addClass("vjs-drawing-" + options.tool);
-			this.el().dataset.value = options.tool;
-			this.el().title = options.title;
-
-			this.on('click', toolChange);
-		}
-	});
-	var brush = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "brush", title: "freehand drawing" }));
-	var rect = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "rect", title: "draw rectangle" }));
-	var arrow = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "arrow", title: "draw arrow" }));
-	var crop = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "crop", title: "select area and click selection to crop" }));
-	var text = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "text", title: "select area, type message and then click somewhere else" }));
-	var eraser = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "eraser", title: "erase drawing in clicked location" }));
-	brush.addClass("vjs-tool-active"); 
-
-	var scaler = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-control vjs-drawing-scaler', title: 'scale image'
-			})
-		})
-	);
-	scaler.on('click', function (e) {
-		var w = canvas_draw.el().width, h = canvas_draw.el().height;
-		var scalew = window.prompt("Current image size is " + w + "x" + h + " . New width?", w);
-		scalew = parseInt(scalew, 10);
-		if (!isNaN(scalew)) {
-			var factor = scalew / w;
-			var width = factor * w | 0;
-			var height = factor * h | 0;
-
-			var r = scaleCropCanvas(0, 0, w, h, width, height, canvas_bg, context_bg);
-			canvas_bg = r[0]; context_bg = r[1];
-			r = scaleCropCanvas(0, 0, w, h, width, height, canvas_draw, context_draw);
-			canvas_draw = r[0]; context_draw = r[1];
-			updateScale();
-		}
-		// just ignore
-	});
 
 	function combineDrawing(encoding) {
 		//blit canvas and open new tab with image
@@ -172,101 +121,9 @@ function snapshot() {
 		imgWindow.document.write('<html><head><title>snapshot - ' + encoding + '</title></head><body><p>Right-click and save image.</p><img src="' + canvas_tmp.toDataURL(encoding) + '" /></body></html>');
 	}
 
-	var dljpeg = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-control vjs-button', innerHTML: 'JPEG', title: 'open new tab with jpeg image'
-			}),
-		})
-	);
-	dljpeg.on('click', function () { combineDrawing("image/jpeg"); });
-	var dlpng = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-control vjs-button', innerHTML: 'PNG', title: 'open new tab with png image'
-			}),
-		})
-	);
-	dlpng.on('click', function () { combineDrawing("image/png"); });
-
-	// close button leading back to normal video play back
-	var close = drawCtrl.addChild('button');
-	close.addClass("vjs-drawing-close");
-	close.el().title = "close screenshot and return to video";
-	close.on('click', function () {
-		// hide cropbox
-		cropbox.hide();
-		// hide all canvas stuff
-		parent.hide();
-		// switch back to normal player controls
-		drawCtrl.hide();
-		player.controlBar.show();
-		player.el().focus();
-	});
-
-	// scale display
-	var scale_txt = drawCtrl.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-scale', innerHTML: '1', title: 'scale factor'
-			}),
-		})
-	);
-
-	// canvas stuff
-	container = parent.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl(null, {
-				className: 'vjs-canvas-container' /*TODO*/
-			}),
-		})
-	);
-	var canvas_bg = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('canvas', {
-			}),
-		})
-	);
-	var context_bg = canvas_bg.el().getContext("2d");
-
-	var canvas_draw = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('canvas', {
-			}),
-		})
-	);
-	var context_draw = canvas_draw.el().getContext("2d");
-
-	var canvas_rect = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('canvas', {
-			}),
-		})
-	);
-	canvas_rect.el().style.zIndex = "1"; // always on top of other canvas elements
-	var context_rect = canvas_rect.el().getContext("2d");
-
-	var canvas_arrow = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('canvas', {
-			}),
-		})
-	);
-	var context_arrow = canvas_arrow.el().getContext("2d");
-
-
-	var cropbox = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('div', {
-				innerHTML: "crop"
-			}),
-		})
-	);
-	cropbox.el().style.display = "flex";
-	// crop handling, create new canvas and replace old one
 	function scaleCropCanvas(left, top, width, height, newwidth, newheight, canvas, context) {
-		// 		var newcanvas = document.createElement('canvas');
-		var newcanvas = new videojs.Component(player, { // FIXME: that's quite silly
+		// crop handling, create new canvas and replace old one
+		var newcanvas = new videojs.Component(player, { 
 			el: videojs.Component.prototype.createEl('canvas', {
 			}),
 		});
@@ -290,7 +147,8 @@ function snapshot() {
 		ctx.lineWidth = context.lineWidth;
 		return [newcanvas, ctx];
 	}
-	cropbox.on('mousedown', function (e) {
+
+	function cropboxClick(e) {
 		var left = scale * cropbox.el().offsetLeft | 0;
 		var top = scale * cropbox.el().offsetTop | 0;
 		var width = scale * cropbox.el().offsetWidth | 0;
@@ -302,45 +160,29 @@ function snapshot() {
 		updateScale();
 
 		cropbox.hide();
-		e.stopPropagation(); //otherwise canvas below gets mousedown
-	});
-
-	var textbox = container.addChild(
-		new videojs.Component(player, {
-			el: videojs.Component.prototype.createEl('textarea', {
-			}),
-		})
-	);
-	textbox.on('keydown', function (e) { // don't fire player shortcuts when textbox has focus
 		e.stopPropagation();
-	});
-	// draw text when textbox looses focus
-	textbox.on('blur', function (e) {
-		context_draw.fillStyle = color.el().value;
-		context_draw.font = (scale * size.el().value * 2) + "px sans-serif";
+	}
+
+	function drawText() {
+		context_draw.fillStyle = colorButton.el().value;
+		context_draw.font = (scale * sizeButton.el().value * 2) + "px sans-serif";
 		context_draw.textBaseline = "top";
 		context_draw.fillText(textbox.el().value,
 			scale * textbox.el().offsetLeft + scale,
 			scale * textbox.el().offsetTop + scale);
 		textbox.hide();
 		textbox.el().value = "";
-	});
+	}
 
-	parent.hide();
-	canvas_rect.hide();
-	canvas_arrow.hide();
-	cropbox.hide();
-	textbox.hide();
-
-	// Function to draw an arrow from (startX, startY) to (endX, endY)
 	function drawArrow(context, startX, startY, endX, endY) {
-		context.beginPath();
+		// Function to draw an arrow from (startX, startY) to (endX, endY)
 		context.lineCap = "square";
+		context.beginPath();
 		context.moveTo(startX, startY);
 		context.lineTo(endX, endY);
 
 		// Arrowhead properties
-		var arrowSize = size.el().value / scale * 4;
+		var arrowSize = sizeButton.el().value / scale * 4;
 		var angle = Math.atan2(endY - startY, endX - startX);
 		var arrowEndX = endX - arrowSize * Math.cos(angle - Math.PI / 6);
 		var arrowEndY = endY - arrowSize * Math.sin(angle - Math.PI / 6);
@@ -355,10 +197,55 @@ function snapshot() {
 		context.stroke();
 	}
 
-	var paint = false;
-	var startX, startY, currentX, currentY;
+	function mouseMove(e) {
+		if (paint) {
+			var pos = container.el().getBoundingClientRect();
+			currentX = e.clientX - pos.left;
+			currentY = e.clientY - pos.top;
 
-	container.on('mousedown', function (e) {
+			switch (tool) {
+				case "brush":
+					context_draw.lineTo(scale * currentX, scale * currentY);
+					context_draw.stroke();
+					break;
+				case "rect":
+					context_rect.clearRect(0, 0, context_rect.canvas.width, context_rect.canvas.height);
+					var width = currentX - startX;
+					var height = currentY - startY;
+					canvas_rect.el().width = Math.abs(width);
+					canvas_rect.el().height = Math.abs(height);
+					canvas_rect.el().style.left = (width < 0 ? currentX : startX) + "px";
+					canvas_rect.el().style.top = (height < 0 ? currentY : startY) + "px";
+					context_rect.strokeStyle = colorButton.el().value;
+					context_rect.lineWidth = sizeButton.el().value / scale;
+					context_rect.strokeRect(0, 0, canvas_rect.el().width, canvas_rect.el().height);
+					break;
+				case "arrow":
+					context_arrow.clearRect(0, 0, context_arrow.canvas.width, context_arrow.canvas.height);
+					drawArrow(context_arrow, startX * scale, startY * scale, currentX * scale, currentY * scale);
+					break;
+				case "crop":
+					cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
+					cropbox.el().style.height = Math.abs(currentY - startY) + "px";
+					cropbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
+					cropbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
+					break;
+				case "text":
+					textbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
+					textbox.el().style.height = Math.abs(currentY - startY) + "px";
+					textbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
+					textbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
+					break;
+				case "eraser":
+					var s = sizeButton.el().value;
+					context_draw.clearRect(scale * currentX - s / 2, scale * currentY - s / 2, s, s);
+					break;
+			}
+			e.preventDefault();
+		}
+	}
+
+	function drawClick(e) {
 		paint = true;
 		var pos = container.el().getBoundingClientRect();
 		startX = e.clientX - pos.left;
@@ -382,7 +269,7 @@ function snapshot() {
 				canvas_rect.show();
 				break;
 			case "arrow":
-				
+
 				canvas_arrow.show();
 				break;
 			case "crop":
@@ -391,8 +278,8 @@ function snapshot() {
 				cropbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
 				cropbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
 
-				cropbox.el().style.border = "1px dashed " + color.el().value;
-				cropbox.el().style.color = color.el().value;
+				cropbox.el().style.border = "1px dashed " + colorButton.el().value;
+				cropbox.el().style.color = colorButton.el().value;
 				cropbox.show();
 				break;
 			case "text":
@@ -403,80 +290,30 @@ function snapshot() {
 					textbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
 					textbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
 
-					textbox.el().style.border = "1px dashed " + color.el().value;
-					textbox.el().style.color = color.el().value;
-					textbox.el().style.font = (size.el().value * 2) + "px sans-serif";
+					textbox.el().style.border = "1px dashed " + colorButton.el().value;
+					textbox.el().style.color = colorButton.el().value;
+					textbox.el().style.font = (sizeButton.el().value * 2) + "px sans-serif";
 					textbox.show();
 				}
 				break;
 			case "eraser":
-				var s = size.el().value;
+				var s = sizeButton.el().value;
 				context_draw.clearRect(scale * currentX - s / 2, scale * currentY - s / 2, s, s);
 				break;
 		}
-	});
-
-	container.on('mousemove', function (e) {
-		if (paint) {
-			var pos = container.el().getBoundingClientRect();
-			currentX = e.clientX - pos.left;
-			currentY = e.clientY - pos.top;
-
-			switch (tool) {
-				case "brush":
-					context_draw.lineTo(scale * currentX, scale * currentY);
-					context_draw.stroke();
-					break;
-				case "rect":
-					context_rect.clearRect(0, 0, context_rect.canvas.width, context_rect.canvas.height);
-					var width = currentX - startX;
-					var height = currentY - startY;
-					canvas_rect.el().width = Math.abs(width);
-					canvas_rect.el().height = Math.abs(height);
-					canvas_rect.el().style.left = (width < 0 ? currentX : startX) + "px";
-					canvas_rect.el().style.top = (height < 0 ? currentY : startY) + "px";
-					context_rect.strokeStyle = color.el().value;
-					context_rect.lineWidth = size.el().value / scale;
-					context_rect.strokeRect(0, 0, canvas_rect.el().width, canvas_rect.el().height);
-					break;
-				case "arrow":
-					context_arrow.clearRect(0, 0, context_arrow.canvas.width, context_arrow.canvas.height);
-					drawArrow(context_arrow, startX*scale, startY*scale, currentX*scale, currentY*scale);
-					break;
-				case "crop":
-					cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
-					cropbox.el().style.height = Math.abs(currentY - startY) + "px";
-					cropbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
-					cropbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
-					break;
-				case "text":
-					textbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
-					textbox.el().style.height = Math.abs(currentY - startY) + "px";
-					textbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
-					textbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
-					break;
-				case "eraser":
-					var s = size.el().value;
-					context_draw.clearRect(scale * currentX - s / 2, scale * currentY - s / 2, s, s);
-					break;
-			}
-			e.preventDefault();
-		}
-	});
+	}
 
 	function finish() {
 		if (paint) {
 			paint = false;
 			if (tool == "rect") {
-				//blit canvas_rect on canvas, scaled
 				context_draw.drawImage(canvas_rect.el(),
 					scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
 					scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
 				canvas_rect.hide();
 			}
-			else if(tool == "arrow")
-			{
-				drawArrow(context_draw, startX*scale, startY*scale, currentX*scale, currentY*scale);
+			else if (tool == "arrow") {
+				drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 				canvas_arrow.hide();
 			}
 			else if (tool == "text") {
@@ -486,9 +323,217 @@ function snapshot() {
 		}
 	}
 
-	container.on('mouseup', finish);
-	container.on('mouseleave', finish);
+	function createBase() {
+		videojs.ToolButton = videojs.Button.extend({
+			init: function (p, options) {
+				videojs.Button.call(this, p, options);
+				this.addClass("vjs-drawing-" + options.tool);
+				this.el().dataset.value = options.tool;
+				this.el().title = options.title;
+	
+				this.on('click', toolChange);
+			}
+		});
 
+		// camera icon on normal player control bar
+		var snap_btn = player.controlBar.addChild('button');
+		snap_btn.addClass("vjs-snapshot-button");
+		snap_btn.el().title = "Take snapshot";
+		snap_btn.on('click', player.snap);
+
+		// drawing controls
+		parent = player.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-canvas-parent'
+				}),
+			})
+		);
+
+		//draw control bar
+		drawCtrl = player.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-control-bar vjs-drawing-ctrl',
+				}),
+			})
+		);
+		drawCtrl.hide();
+	}
+
+	function createColorButton() {
+		// choose color, used everywhere: painting, border color of cropbox
+		colorButton = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('input', {
+					className: 'vjs-control', type: 'color', value: '#df4b26', title: 'color'
+				}),
+			})
+		);
+		colorButton.on('change', function (e) {
+			context_draw.strokeStyle = colorButton.el().value;
+			context_arrow.strokeStyle = colorButton.el().value;
+		});
+	}
+
+	function createSizeButton() {
+		// choose size, used everywhere: line width, text size
+		sizeButton = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('input', {
+					className: 'vjs-control', type: 'number', value: '10', title: 'line width, text size, ...'
+				}),
+			})
+		);
+		sizeButton.on('keydown', function (e) {
+			e.stopPropagation();
+		});
+		sizeButton.on('change', function (e) {
+			context_draw.lineWidth = sizeButton.el().value / 2;
+			context_arrow.lineWidth = sizeButton.el().value / 2;
+		});
+	}
+
+	function createScalerButton() {
+		var scaler = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-control vjs-drawing-scaler', title: 'scale image'
+				})
+			})
+		);
+		scaler.on('click', function (e) {
+			var w = canvas_draw.el().width, h = canvas_draw.el().height;
+			var scalew = window.prompt("Current image size is " + w + "x" + h + " . New width?", w);
+			scalew = parseInt(scalew, 10);
+			if (!isNaN(scalew)) {
+				var factor = scalew / w;
+				var width = factor * w | 0;
+				var height = factor * h | 0;
+
+				var r = scaleCropCanvas(0, 0, w, h, width, height, canvas_bg, context_bg);
+				canvas_bg = r[0]; context_bg = r[1];
+				r = scaleCropCanvas(0, 0, w, h, width, height, canvas_draw, context_draw);
+				canvas_draw = r[0]; context_draw = r[1];
+				updateScale();
+			}
+		});
+	}
+
+	function createJpegPngButton() {
+		var dljpeg = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-control vjs-button', innerHTML: 'JPEG', title: 'open new tab with jpeg image'
+				}),
+			})
+		);
+		dljpeg.on('click', function () { combineDrawing("image/jpeg"); });
+		var dlpng = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-control vjs-button', innerHTML: 'PNG', title: 'open new tab with png image'
+				}),
+			})
+		);
+		dlpng.on('click', function () { combineDrawing("image/png"); });
+	}
+
+	function createCloseButton() {
+		var close = drawCtrl.addChild('button');
+		close.addClass("vjs-drawing-close");
+		close.el().title = "close screenshot and return to video";
+		close.on('click', function () {
+			// hide cropbox
+			cropbox.hide();
+			// hide all canvas stuff
+			parent.hide();
+			// switch back to normal player controls
+			drawCtrl.hide();
+			player.controlBar.show();
+			player.el().focus();
+		});
+	}
+
+	function createScaleText() {
+		// scale display
+		scale_txt = drawCtrl.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-scale', innerHTML: '1', title: 'scale factor'
+				}),
+			})
+		);
+	}
+
+	function createBackgroundCanvas() {
+		container = parent.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl(null, {
+					className: 'vjs-canvas-container' /*TODO*/
+				}),
+			})
+		);
+		canvas_bg = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('canvas', {}),
+			})
+		);
+		context_bg = canvas_bg.el().getContext("2d");
+	}
+
+	function createDrawCanvas() {
+		canvas_draw = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('canvas', {}),
+			})
+		);
+		context_draw = canvas_draw.el().getContext("2d");
+	}
+
+	function createRectangleCanvas() {
+		canvas_rect = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('canvas', {}),
+			})
+		);
+		canvas_rect.el().style.zIndex = "1";
+		context_rect = canvas_rect.el().getContext("2d");
+	}
+
+	function createArrowCanvas() {
+		canvas_arrow = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('canvas', {}),
+			})
+		);
+		context_arrow = canvas_arrow.el().getContext("2d");
+	}
+
+	function drawCropbox() {
+		cropbox = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('div', {
+					innerHTML: "crop"
+				}),
+			})
+		);
+		cropbox.el().style.display = "flex";
+		cropbox.on('mousedown', function (e) { cropboxClick(e); });
+
+	}
+
+	function drawTextbox() {
+		textbox = container.addChild(
+			new videojs.Component(player, {
+				el: videojs.Component.prototype.createEl('textarea', {}),
+			})
+		);
+		textbox.on('keydown', function (e) { e.stopPropagation(); });
+		// draw text when textbox looses focus
+		textbox.on('blur', drawText);
+
+	}
 }
 
 videojs.plugin('snapshot', snapshot);
