@@ -32,6 +32,20 @@
 
 .vjs-default-skin .vjs-drawing-text::before {
   content: ""; }
+  
+.vjs-default-skin .vjs-drawing-arrow::before {
+  position: relative;
+  padding: 3px 0px; 
+  color: rgba(255, 255, 255, 0.83);
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  content: '\2192'; /* Unicode character for right arrow */
+  display: inline-block;
+  font-size: 20px;
+  vertical-align: middle; 
+  line-height: 1; 
+}
 
 
 /* Canvas and drawing styles */

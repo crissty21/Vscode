@@ -4,12 +4,12 @@ function snapshot() {
 	var container, scale;
 	var tool = 'brush';
 	var drawCtrl, parent;
-	var colorButton, sizeButton;
+	var colorButton, sizeButton, shapeButton;
 	var scale_txt;
 	var canvas_bg, context_bg;
 	var canvas_draw, context_draw;
 	var context_rect, canvas_rect;
-	var canvas_arrow, context_arrow;
+	var canvas_shape, context_shape;
 	var cropbox, textbox;
 	var paint = false;
 	var startX, startY, currentX, currentY;
@@ -27,13 +27,13 @@ function snapshot() {
 	createBackgroundCanvas();
 	createDrawCanvas();
 	createRectangleCanvas();
-	createArrowCanvas();
+	createShapeCanvas();
 	drawCropbox();
 	drawTextbox();
 
 	parent.hide();
 	canvas_rect.hide();
-	canvas_arrow.hide();
+	canvas_shape.hide();
 	cropbox.hide();
 	textbox.hide();
 
@@ -56,11 +56,11 @@ function snapshot() {
 		context_draw.lineWidth = sizeButton.el().value / 2;
 		context_draw.lineCap = "round";
 
-		canvas_arrow.el().width = video.videoWidth;
-		canvas_arrow.el().height = video.videoHeight;
-		context_arrow.strokeStyle = colorButton.el().value;
-		context_arrow.lineWidth = sizeButton.el().value / 2;
-		context_arrow.lineCap = "square";
+		canvas_shape.el().width = video.videoWidth;
+		canvas_shape.el().height = video.videoHeight;
+		context_shape.strokeStyle = colorButton.el().value;
+		context_shape.lineWidth = sizeButton.el().value / 2;
+		context_shape.lineCap = "square";
 		// calculate scale
 		updateScale();
 
@@ -77,8 +77,8 @@ function snapshot() {
 		canvas_draw.el().style.maxHeight = rect.height + "px";
 		canvas_bg.el().style.maxWidth = rect.width + "px";
 		canvas_bg.el().style.maxHeight = rect.height + "px";
-		canvas_arrow.el().style.maxWidth = rect.width + "px";
-		canvas_arrow.el().style.maxHeight = rect.height + "px";
+		canvas_shape.el().style.maxWidth = rect.width + "px";
+		canvas_shape.el().style.maxHeight = rect.height + "px";
 	}
 
 	function updateScale() {
@@ -91,6 +91,7 @@ function snapshot() {
 
 	function createToolsButtons() {
 		var brush = drawCtrl.addChild(new videojs.ToolButton(player, { tool: "brush", title: "freehand drawing" }));
+		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "line", title: "draw line" }));
 		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "rect", title: "draw rectangle" }));
 		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "arrow", title: "draw arrow" }));
 		drawCtrl.addChild(new videojs.ToolButton(player, { tool: "crop", title: "select area and click selection to crop" }));
@@ -197,6 +198,14 @@ function snapshot() {
 		context.stroke();
 	}
 
+	function drawLine(context, startX, startY, endX, endY) {
+		context.lineCap = "square";
+		context.beginPath();
+		context.moveTo(startX, startY);
+		context.lineTo(endX, endY);
+		context.stroke();
+	}
+
 	function mouseMove(e) {
 		if (paint) {
 			var pos = container.el().getBoundingClientRect();
@@ -207,6 +216,10 @@ function snapshot() {
 				case "brush":
 					context_draw.lineTo(scale * currentX, scale * currentY);
 					context_draw.stroke();
+					break;
+				case "line":
+					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
+					drawLine(context_shape, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "rect":
 					context_rect.clearRect(0, 0, context_rect.canvas.width, context_rect.canvas.height);
@@ -221,8 +234,8 @@ function snapshot() {
 					context_rect.strokeRect(0, 0, canvas_rect.el().width, canvas_rect.el().height);
 					break;
 				case "arrow":
-					context_arrow.clearRect(0, 0, context_arrow.canvas.width, context_arrow.canvas.height);
-					drawArrow(context_arrow, startX * scale, startY * scale, currentX * scale, currentY * scale);
+					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
+					drawArrow(context_shape, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "crop":
 					cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
@@ -260,6 +273,9 @@ function snapshot() {
 				context_draw.lineTo(currentX * scale, currentY * scale);
 				context_draw.stroke();
 				break;
+			case "line":
+				canvas_shape.show();
+				break;
 			case "rect":
 				// rectangle is scaled when blitting, not when dragging
 				canvas_rect.el().width = 0;
@@ -269,8 +285,7 @@ function snapshot() {
 				canvas_rect.show();
 				break;
 			case "arrow":
-
-				canvas_arrow.show();
+				canvas_shape.show();
 				break;
 			case "crop":
 				cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
@@ -306,19 +321,25 @@ function snapshot() {
 	function finish() {
 		if (paint) {
 			paint = false;
-			if (tool == "rect") {
-				context_draw.drawImage(canvas_rect.el(),
+			switch (tool){
+				case "rect":
+					context_draw.drawImage(canvas_rect.el(),
 					scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
 					scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
-				canvas_rect.hide();
-			}
-			else if (tool == "arrow") {
-				drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
-				canvas_arrow.hide();
-			}
-			else if (tool == "text") {
-				player.el().blur();
-				textbox.el().focus();
+					canvas_rect.hide();
+					break;
+				case "arrow":
+					drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
+					canvas_shape.hide();
+					break;
+				case "line":
+					drawLine(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
+					canvas_shape.hide();
+					break;
+				case "text":
+					player.el().blur();
+					textbox.el().focus();
+					break;
 			}
 		}
 	}
@@ -360,6 +381,7 @@ function snapshot() {
 		);
 		drawCtrl.hide();
 	}
+	
 
 	function createColorButton() {
 		// choose color, used everywhere: painting, border color of cropbox
@@ -372,7 +394,7 @@ function snapshot() {
 		);
 		colorButton.on('change', function (e) {
 			context_draw.strokeStyle = colorButton.el().value;
-			context_arrow.strokeStyle = colorButton.el().value;
+			context_shape.strokeStyle = colorButton.el().value;
 		});
 	}
 
@@ -390,7 +412,7 @@ function snapshot() {
 		});
 		sizeButton.on('change', function (e) {
 			context_draw.lineWidth = sizeButton.el().value / 2;
-			context_arrow.lineWidth = sizeButton.el().value / 2;
+			context_shape.lineWidth = sizeButton.el().value / 2;
 		});
 	}
 
@@ -501,13 +523,13 @@ function snapshot() {
 		context_rect = canvas_rect.el().getContext("2d");
 	}
 
-	function createArrowCanvas() {
-		canvas_arrow = container.addChild(
+	function createShapeCanvas() {
+		canvas_shape = container.addChild(
 			new videojs.Component(player, {
 				el: videojs.Component.prototype.createEl('canvas', {}),
 			})
 		);
-		context_arrow = canvas_arrow.el().getContext("2d");
+		context_shape = canvas_shape.el().getContext("2d");
 	}
 
 	function drawCropbox() {
