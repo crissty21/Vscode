@@ -4,11 +4,10 @@ function snapshot() {
 	var container, scale;
 	var tool = 'brush';
 	var drawCtrl, parent;
-	var colorButton, sizeButton, shapeButton;
+	var colorButton, sizeButton;
 	var scale_txt;
 	var canvas_bg, context_bg;
 	var canvas_draw, context_draw;
-	var context_rect, canvas_rect;
 	var canvas_shape, context_shape;
 	var cropbox, textbox;
 	var paint = false;
@@ -26,13 +25,11 @@ function snapshot() {
 	createScaleText();
 	createBackgroundCanvas();
 	createDrawCanvas();
-	createRectangleCanvas();
 	createShapeCanvas();
 	drawCropbox();
 	drawTextbox();
 
 	parent.hide();
-	canvas_rect.hide();
 	canvas_shape.hide();
 	cropbox.hide();
 	textbox.hide();
@@ -49,13 +46,16 @@ function snapshot() {
 		drawCtrl.show();
 		parent.show();
 
-		// canvas for drawing, it's separate from snapshot because of delete
+		// this canvas will hold all the drawings
+		// using the drawing tool you will draw directly on this
 		canvas_draw.el().width = video.videoWidth;
 		canvas_draw.el().height = video.videoHeight;
 		context_draw.strokeStyle = colorButton.el().value;
 		context_draw.lineWidth = sizeButton.el().value / 2;
 		context_draw.lineCap = "round";
 
+		//this canvas is used for drawing shapes
+		//it is separeted from canvas_draw because it will be erased at every frame
 		canvas_shape.el().width = video.videoWidth;
 		canvas_shape.el().height = video.videoHeight;
 		context_shape.strokeStyle = colorButton.el().value;
@@ -67,7 +67,6 @@ function snapshot() {
 		// background canvas containing snapshot from video
 		canvas_bg.el().width = video.videoWidth;
 		canvas_bg.el().height = video.videoHeight;
-
 		context_bg.drawImage(video, 0, 0);
 
 
@@ -110,7 +109,8 @@ function snapshot() {
 	}
 
 	function combineDrawing(encoding) {
-		//blit canvas and open new tab with image
+		//this will take the background and the drawing canvas and merge them
+		//the result will be sent to a new tab
 		var canvas_tmp = document.createElement('canvas');
 		canvas_tmp.width = canvas_draw.el().width;
 		canvas_tmp.height = canvas_draw.el().height;
@@ -222,16 +222,16 @@ function snapshot() {
 					drawLine(context_shape, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "rect":
-					context_rect.clearRect(0, 0, context_rect.canvas.width, context_rect.canvas.height);
+					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
 					var width = currentX - startX;
 					var height = currentY - startY;
-					canvas_rect.el().width = Math.abs(width);
-					canvas_rect.el().height = Math.abs(height);
-					canvas_rect.el().style.left = (width < 0 ? currentX : startX) + "px";
-					canvas_rect.el().style.top = (height < 0 ? currentY : startY) + "px";
-					context_rect.strokeStyle = colorButton.el().value;
-					context_rect.lineWidth = sizeButton.el().value / scale;
-					context_rect.strokeRect(0, 0, canvas_rect.el().width, canvas_rect.el().height);
+					canvas_shape.el().width = Math.abs(width);
+					canvas_shape.el().height = Math.abs(height);
+					canvas_shape.el().style.left = (width < 0 ? currentX : startX) + "px";
+					canvas_shape.el().style.top = (height < 0 ? currentY : startY) + "px";
+					context_shape.strokeStyle = colorButton.el().value;
+					context_shape.lineWidth = sizeButton.el().value / scale;
+					context_shape.strokeRect(0, 0, canvas_shape.el().width, canvas_shape.el().height);
 					break;
 				case "arrow":
 					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
@@ -278,11 +278,11 @@ function snapshot() {
 				break;
 			case "rect":
 				// rectangle is scaled when blitting, not when dragging
-				canvas_rect.el().width = 0;
-				canvas_rect.el().height = 0;
-				canvas_rect.el().style.left = (startX < currentX ? startX : currentX) + "px";
-				canvas_rect.el().style.top = (startY < currentY ? startY : currentY) + "px";
-				canvas_rect.show();
+				canvas_shape.el().width = 0;
+				canvas_shape.el().height = 0;
+				canvas_shape.el().style.left = (startX < currentX ? startX : currentX) + "px";
+				canvas_shape.el().style.top = (startY < currentY ? startY : currentY) + "px";
+				canvas_shape.show();
 				break;
 			case "arrow":
 				canvas_shape.show();
@@ -323,10 +323,10 @@ function snapshot() {
 			paint = false;
 			switch (tool){
 				case "rect":
-					context_draw.drawImage(canvas_rect.el(),
+					context_draw.drawImage(canvas_shape.el(),
 					scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
 					scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
-					canvas_rect.hide();
+					canvas_shape.hide();
 					break;
 				case "arrow":
 					drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
@@ -513,15 +513,7 @@ function snapshot() {
 		context_draw = canvas_draw.el().getContext("2d");
 	}
 
-	function createRectangleCanvas() {
-		canvas_rect = container.addChild(
-			new videojs.Component(player, {
-				el: videojs.Component.prototype.createEl('canvas', {}),
-			})
-		);
-		canvas_rect.el().style.zIndex = "1";
-		context_rect = canvas_rect.el().getContext("2d");
-	}
+
 
 	function createShapeCanvas() {
 		canvas_shape = container.addChild(
@@ -529,6 +521,7 @@ function snapshot() {
 				el: videojs.Component.prototype.createEl('canvas', {}),
 			})
 		);
+		canvas_shape.el().style.zIndex = "1";
 		context_shape = canvas_shape.el().getContext("2d");
 	}
 

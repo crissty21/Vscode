@@ -36,7 +36,6 @@
 .vjs-default-skin .vjs-drawing-arrow::before {
   position: relative;
   padding: 3px 0px; 
-  color: rgba(255, 255, 255, 0.83);
   border: none;
   cursor: pointer;
   font-size: 16px;
@@ -45,6 +44,19 @@
   font-size: 20px;
   vertical-align: middle; 
   line-height: 1; 
+}
+
+.vjs-default-skin .vjs-drawing-line::before {
+  
+    position: relative;
+    padding: 0px 10px; 
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    overflow: hidden; /* Hide the overflow to create a diagonal line effect */
+    content: '|';
+    transform: rotate(90deg); /* Rotate the line to create the diagonal effect */  
 }
 
 
