@@ -29,15 +29,15 @@
 			<div class="frame-skip skip-div">
 
 				<div class="frame-buttons">
-					<button onclick="forwardFrames(-1)">Frames Backward</button>
-					<button onclick="forwardFrames(1)">Frames Forward</button>
+					<button class="buttons-controls" onclick="forwardFrames(-1)">Frames Backward</button>
+					<button class="buttons-controls" onclick="forwardFrames(1)">Frames Forward</button>
 				</div>
 
 				<div class="frame-selector selector" onmousemove="enableScroll(1)" onmouseleave="disableScroll()">
 
-					<button onclick="updateStep(-1)">&lt;</button>
+					<button  onclick="updateStep(-1)">&lt;</button>
 					<span id="current-step">1</span>
-					<button onclick="updateStep(1)">&gt;</button>
+					<button  onclick="updateStep(1)">&gt;</button>
 
 					<span>&larr; Number of frames</span>
 				</div>
@@ -51,8 +51,8 @@
 			<div class="seconds-skip skip-div">
 
 				<div class="seconds-buttons">
-					<button onclick="forwardSeconds(-1)">Seconds Backward</button>
-					<button onclick="forwardSeconds(1)">Seconds Forward</button>
+					<button class="buttons-controls" onclick="forwardSeconds(-1)">Seconds Backward</button>
+					<button class="buttons-controls" onclick="forwardSeconds(1)">Seconds Forward</button>
 				</div>
 
 				<div class="seconds-selector selector" onmousemove="enableScroll(2)" onmouseleave="disableScroll()">

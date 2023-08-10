@@ -8,6 +8,8 @@ var bUpdateSeconds = true;
 var scrollEnabled = false;
 var scrollType = 1;
 
+//this file takes care of control buttons 
+
 switchSeconds.addEventListener('change', function () {
     if (switchSeconds.checked) {
         bUpdateSeconds = true;

@@ -1,3 +1,4 @@
+//this file takes care of the snapshot functionality, including the drawing tools 
 function snapshot() {
 	var player = this;
 	var video = player.el().querySelector('video');
@@ -39,7 +40,17 @@ function snapshot() {
 	container.on('mouseup', finish);
 	container.on('mouseleave', finish);
 
+	function enableDisableControls(value) {
+		var buttons = document.querySelectorAll(".buttons-controls");
+		buttons.forEach(function (button) {
+			button.disabled = value;
+		});
+		var fileInput = document.getElementById("files");
+		fileInput.disabled = value;
+
+	}
 	function snap() {
+		enableDisableControls(true);
 		player.pause();
 		player.el().blur();
 		player.controlBar.hide();
@@ -182,7 +193,7 @@ function snapshot() {
 		context.lineTo(endX, endY);
 
 		// Arrowhead properties
-		var arrowSize = sizeButton.el().value / scale * 4;
+		var arrowSize = sizeButton.el().value / scale * 2;
 		var angle = Math.atan2(endY - startY, endX - startX);
 		var arrowEndX = endX - arrowSize * Math.cos(angle - Math.PI / 6);
 		var arrowEndY = endY - arrowSize * Math.sin(angle - Math.PI / 6);
@@ -326,8 +337,6 @@ function snapshot() {
 			e.preventDefault();
 		}
 	}
-
-
 
 	function finish() {
 		if (paint) {
@@ -484,6 +493,8 @@ function snapshot() {
 			drawCtrl.hide();
 			player.controlBar.show();
 			player.el().focus();
+		enableDisableControls(false);
+
 		});
 	}
 
