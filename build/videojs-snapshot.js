@@ -14,7 +14,7 @@ function snapshot() {
 	var startX, startY, currentX, currentY;
 
 	player.snap = snap;
-	
+
 	createBase();
 	createColorButton();
 	createSizeButton();
@@ -71,7 +71,7 @@ function snapshot() {
 
 
 		// still fit into player element
-		var rect = video.getBoundingClientRect(); // use bounding rect instead of player.width/height because of fullscreen
+		var rect = video.getBoundingClientRect();
 		canvas_draw.el().style.maxWidth = rect.width + "px";
 		canvas_draw.el().style.maxHeight = rect.height + "px";
 		canvas_bg.el().style.maxWidth = rect.width + "px";
@@ -104,7 +104,6 @@ function snapshot() {
 		active_tool.classList.remove('vjs-tool-active');
 		event.target.classList.add('vjs-tool-active');
 		tool = event.target.dataset.value;
-		// always hide cropbox, textbox is hidden automatically as it blurs
 		cropbox.hide();
 	}
 
@@ -124,7 +123,7 @@ function snapshot() {
 
 	function scaleCropCanvas(left, top, width, height, newwidth, newheight, canvas, context) {
 		// crop handling, create new canvas and replace old one
-		var newcanvas = new videojs.Component(player, { 
+		var newcanvas = new videojs.Component(player, {
 			el: videojs.Component.prototype.createEl('canvas', {
 			}),
 		});
@@ -206,6 +205,72 @@ function snapshot() {
 		context.stroke();
 	}
 
+	function drawClick(e) {
+		paint = true;
+		var pos = container.el().getBoundingClientRect();
+		startX = e.clientX - pos.left;
+		startY = e.clientY - pos.top;
+		currentX = startX;
+		currentY = startY;
+
+		switch (tool) {
+			case "brush":
+				context_draw.beginPath();
+				context_draw.moveTo(startX * scale, startY * scale);
+				context_draw.lineTo(currentX * scale, currentY * scale);
+				context_draw.stroke();
+				break;
+			case "line":
+				canvas_shape.el().width = video.videoWidth;
+				canvas_shape.el().height = video.videoHeight;
+				canvas_shape.el().style.left = "0px";
+				canvas_shape.el().style.top = "0px";
+				canvas_shape.show();
+				break;
+			case "rect":
+				canvas_shape.el().width = 0;
+				canvas_shape.el().height = 0;
+				canvas_shape.el().style.left = (startX < currentX ? startX : currentX) + "px";
+				canvas_shape.el().style.top = (startY < currentY ? startY : currentY) + "px";
+				canvas_shape.show();
+				break;
+			case "arrow":
+				canvas_shape.el().width = video.videoWidth;
+				canvas_shape.el().height = video.videoHeight;
+				canvas_shape.el().style.left = "0px";
+				canvas_shape.el().style.top = "0px";
+				canvas_shape.show();
+				break;
+			case "crop":
+				cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
+				cropbox.el().style.height = Math.abs(currentY - startY) + "px";
+				cropbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
+				cropbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
+
+				cropbox.el().style.border = "1px dashed " + colorButton.el().value;
+				cropbox.el().style.color = colorButton.el().value;
+				cropbox.show();
+				break;
+			case "text":
+				// if shown already, lose focus and draw it first, otherwise, it gets drawn at mousedown
+				if (textbox.hasClass("vjs-hidden")) {
+					textbox.el().style.width = Math.abs(currentX - startX) + "px";
+					textbox.el().style.height = Math.abs(currentY - startY) + "px";
+					textbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
+					textbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
+
+					textbox.el().style.border = "1px dashed " + colorButton.el().value;
+					textbox.el().style.color = colorButton.el().value;
+					textbox.el().style.font = (sizeButton.el().value * 2) + "px sans-serif";
+					textbox.show();
+				}
+				break;
+			case "eraser":
+				var s = sizeButton.el().value;
+				context_draw.clearRect(scale * currentX - s / 2, scale * currentY - s / 2, s, s);
+				break;
+		}
+	}
 	function mouseMove(e) {
 		if (paint) {
 			var pos = container.el().getBoundingClientRect();
@@ -219,6 +284,8 @@ function snapshot() {
 					break;
 				case "line":
 					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
+					context_shape.strokeStyle = colorButton.el().value;
+					context_shape.lineWidth = sizeButton.el().value / 2;
 					drawLine(context_shape, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "rect":
@@ -235,6 +302,8 @@ function snapshot() {
 					break;
 				case "arrow":
 					context_shape.clearRect(0, 0, context_shape.canvas.width, context_shape.canvas.height);
+					context_shape.strokeStyle = colorButton.el().value;
+					context_shape.lineWidth = sizeButton.el().value / 2;
 					drawArrow(context_shape, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "crop":
@@ -258,83 +327,25 @@ function snapshot() {
 		}
 	}
 
-	function drawClick(e) {
-		paint = true;
-		var pos = container.el().getBoundingClientRect();
-		startX = e.clientX - pos.left;
-		startY = e.clientY - pos.top;
-		currentX = startX;
-		currentY = startY;
 
-		switch (tool) {
-			case "brush":
-				context_draw.beginPath();
-				context_draw.moveTo(startX * scale, startY * scale);
-				context_draw.lineTo(currentX * scale, currentY * scale);
-				context_draw.stroke();
-				break;
-			case "line":
-				canvas_shape.show();
-				break;
-			case "rect":
-				// rectangle is scaled when blitting, not when dragging
-				canvas_shape.el().width = 0;
-				canvas_shape.el().height = 0;
-				canvas_shape.el().style.left = (startX < currentX ? startX : currentX) + "px";
-				canvas_shape.el().style.top = (startY < currentY ? startY : currentY) + "px";
-				canvas_shape.show();
-				break;
-			case "arrow":
-				canvas_shape.show();
-				break;
-			case "crop":
-				cropbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
-				cropbox.el().style.height = Math.abs(currentY - startY) + "px";
-				cropbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
-				cropbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
-
-				cropbox.el().style.border = "1px dashed " + colorButton.el().value;
-				cropbox.el().style.color = colorButton.el().value;
-				cropbox.show();
-				break;
-			case "text":
-				// if shown already, lose focus and draw it first, otherwise, it gets drawn at mousedown
-				if (textbox.hasClass("vjs-hidden")) {
-					textbox.el().style.width = Math.abs(currentX - startX) + "px"; // resize
-					textbox.el().style.height = Math.abs(currentY - startY) + "px";
-					textbox.el().style.left = (currentX < startX ? currentX : startX) + "px";
-					textbox.el().style.top = (currentY < startY ? currentY : startY) + "px";
-
-					textbox.el().style.border = "1px dashed " + colorButton.el().value;
-					textbox.el().style.color = colorButton.el().value;
-					textbox.el().style.font = (sizeButton.el().value * 2) + "px sans-serif";
-					textbox.show();
-				}
-				break;
-			case "eraser":
-				var s = sizeButton.el().value;
-				context_draw.clearRect(scale * currentX - s / 2, scale * currentY - s / 2, s, s);
-				break;
-		}
-	}
 
 	function finish() {
 		if (paint) {
 			paint = false;
-			switch (tool){
+			switch (tool) {
 				case "rect":
 					context_draw.drawImage(canvas_shape.el(),
-					scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
-					scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
+						scale * (startX < currentX ? startX : currentX), scale * (startY < currentY ? startY : currentY),
+						scale * Math.abs(currentX - startX), scale * Math.abs(currentY - startY));
 					canvas_shape.hide();
 					break;
 				case "arrow":
-					drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					canvas_shape.hide();
+					drawArrow(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "line":
-					drawLine(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					canvas_shape.hide();
+					drawLine(context_draw, startX * scale, startY * scale, currentX * scale, currentY * scale);
 					break;
 				case "text":
 					player.el().blur();
@@ -351,7 +362,6 @@ function snapshot() {
 				this.addClass("vjs-drawing-" + options.tool);
 				this.el().dataset.value = options.tool;
 				this.el().title = options.title;
-	
 				this.on('click', toolChange);
 			}
 		});
@@ -381,7 +391,7 @@ function snapshot() {
 		);
 		drawCtrl.hide();
 	}
-	
+
 
 	function createColorButton() {
 		// choose color, used everywhere: painting, border color of cropbox
