@@ -8,7 +8,7 @@
 
 	<link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
 	<script src="http://vjs.zencdn.net/4.12/video.js"></script>
-
+	
 	<link href="./build/videojs-snapshot.css" rel="stylesheet" type="text/css" />
 	<script src="./build/videojs-snapshot.js"></script>
 	<script src="./noUiSlider-15.7.1/dist/nouislider.js"></script>
@@ -21,7 +21,7 @@
 <body>
 	<div class="video-container">
 		<div id="video-background">
-
+			<p id="fpsDisplay">FPS will appear here!</p>
 			<video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls"
 				preload="auto" width="640" height="480">
 				<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
@@ -90,10 +90,14 @@
 
 	<script>
 		var player = videojs('my-video');
+		var fps;
+		var video = player.el().querySelector('video');
+
 		player.snapshot();
 	</script>
-	<script src="javascript.js"></script>
+	<script src="calculatefps.js"></script>
 	<script src="gifexport.js"></script>
+	<script src="javascript.js"></script>
 
 
 </body>

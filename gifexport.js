@@ -1,7 +1,17 @@
-var player = videojs('my-video');
-var formatSlider = document.getElementById('slider');
-var fps = 30;
+/**
+ * This script handles exporting GIFs
+ */
 
+var formatSlider = document.getElementById('slider');
+var exportButton = document.getElementById("exportButton");
+var gifSelectorDiv = document.getElementById("gif-selector");
+
+var formatValues = [
+  document.getElementById('formatting-start'),
+  document.getElementById('formatting-end')
+];
+
+// Format configuration for the slider
 var formatForSlider = {
   from: function (formattedValue) {
     return Number(formattedValue);
@@ -10,9 +20,6 @@ var formatForSlider = {
     return Math.floor(numericValue);
   }
 };
-// Get reference to the export button and the gif-selector div
-var exportButton = document.getElementById("exportButton");
-var gifSelectorDiv = document.getElementById("gif-selector");
 
 // Add click event listener to the export button
 exportButton.addEventListener("click", function () {
@@ -25,10 +32,10 @@ exportButton.addEventListener("click", function () {
     gifSelectorDiv.style.display = "none";
     destroySlider();
     enableDisableControls(false);
-
   }
 });
 
+// Function to enable or disable various controls
 function enableDisableControls(value) {
   var buttons = document.querySelectorAll(".buttons-controls");
   buttons.forEach(function (button) {
@@ -36,16 +43,17 @@ function enableDisableControls(value) {
   });
   var fileInput = document.getElementById("files");
   fileInput.disabled = value;
-
 }
+
+// Function to destroy the slider
 function destroySlider() {
   slider = document.getElementById('slider');
   delete slider.noUiSlider;
-  slider.innerHTML="";
+  slider.innerHTML = "";
 }
 
-function createSlider(){
-
+// Function to create the slider
+function createSlider() {
   noUiSlider.create(formatSlider, {
     // Values are parsed as numbers using the "from" function in "format"
     start: ['20.0', '80.0'],
@@ -61,16 +69,10 @@ function createSlider(){
       }
     }
   });
-  
-  formatSlider.noUiSlider.set(['25.666', '57.66']);
-  
-  var formatValues = [
-    document.getElementById('formatting-start'),
-    document.getElementById('formatting-end')
-  ];
-  
-  formatSlider.noUiSlider.on('update', function (values, handle, unencoded) {
 
+  formatSlider.noUiSlider.set(['25.666', '57.66']);
+
+  formatSlider.noUiSlider.on('update', function (values, handle, unencoded) {
     formatValues[handle].innerHTML = "Second: " + values[handle] + "<br>" + 'Frame number: ' + Math.floor(unencoded[handle] * fps);
     player.currentTime(unencoded[handle]);
   });
