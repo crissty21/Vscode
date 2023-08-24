@@ -4,6 +4,11 @@
  * to estimate the FPS at which the video is being played.
  */
 
+// Most of the code is useless, i left it here in case the current version does not work corectly
+// This var controls the number of frames over witch the fps is calculated 
+
+var number_of_franes = 1;
+
 var last_media_time, last_frame_num;
 var fps_rounder = [];
 
@@ -24,7 +29,6 @@ function ticker(useless, metadata) {
         diff &&
         diff < 1 &&
         frame_not_seeked &&
-        fps_rounder.length < 50 &&
         video.playbackRate === 1 &&
         document.hasFocus()
     ) {
@@ -41,17 +45,22 @@ function ticker(useless, metadata) {
     last_media_time = metadata.mediaTime;
     last_frame_num = metadata.presentedFrames;
 
-    // Request the next video frame update
-    video.requestVideoFrameCallback(ticker);
+    if(fps_rounder.length < number_of_franes+ 1)
+    {
+        // Request the next video frame update
+        video.requestVideoFrameCallback(ticker);
+    }
 }
 
-// Initialize the ticker by requesting the first video frame update
-video.requestVideoFrameCallback(ticker);
+function init_calculation()
+{
+    fps_rounder = [];
+    frame_not_seeked = true;
 
-video.addEventListener("seeked", function () {
-    fps_rounder.pop();
-    frame_not_seeked = false;
-});
+    // Initialize the ticker by requesting the first video frame update
+    video.requestVideoFrameCallback(ticker);
+
+}
 
 function get_fps_average() {
     return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;

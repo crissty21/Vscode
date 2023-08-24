@@ -55,6 +55,9 @@ function updateSeconds(step) {
 document.getElementById('files').addEventListener('change', function (event) {
     var file = event.target.files[0];
     player.src({ type: "video/mp4", src: URL.createObjectURL(file) });
+
+    // When changing the file init the fps calculation
+    init_calculation();
 }, false);
 
 // Function to enable scroll-based interaction
