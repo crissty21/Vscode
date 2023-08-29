@@ -210,3 +210,54 @@ button[disabled] {
     background-color: #ccc;
     color: #888;
 }
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Style for the properties container */
+#properties {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    display: none;
+}
+
+/* Style for labels and inputs */
+label {
+    display: inline-block;
+    width: 120px;
+    margin-right: 5px;
+    text-align: right;
+}
+
+select, input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+.frame-container {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.example-val {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    width: 150px;
+    text-align: center;
+}
+
+.example-val input[type="number"] {
+    width: 50px;
+    padding: 2px;
+}

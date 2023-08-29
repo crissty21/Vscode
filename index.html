@@ -38,13 +38,39 @@
 		</div>
 
 		<div id="gif-selector" style="width: 100%;display: none;">
-
+			
 			<div id="slider" style="margin-top: 50px;"></div>
-			<div style="width: 100%; margin-top: 10px; margin-bottom: 10px;">
-				<span style="float:left" class="example-val" id="formatting-start"></span>
-				<span style="float:right" class="example-val" id="formatting-end"></span>
+			<div class="frame-container">
+				<span class="example-val">
+					Frame number: <input type="number" id="formatting-start" >
+				</span>
+				<span class="example-val" >
+					Frame number: <input type="number" id="formatting-end">
+				</span>
 			</div>
 		</div>
+
+		<div id="properties"style="margin-top: 20px;">
+			<label for="looping">Looping: </label>
+			<select id="looping">
+			  <option value="0">Off</option>
+			  <option value="1">On</option>
+			</select>
+			<br>
+		
+			<label for="quality">Quality: </label>
+			<input type="number" id="quality" min="1" max="9">
+			<br>
+		
+			<label for="delay">Delay (microseconds): </label>
+			<input type="number" id="delay" min="1">
+			<br>
+		
+			<label for="resolution">GIF Resolution: </label>
+			<input type="number" id="resolutionWidth" min="1" placeholder="Width">
+			<input type="number" id="resolutionHeight" min="1" placeholder="Height">
+	
+		  </div>
 
 		<div class="button-container">
 			<div class="frame-skip skip-div">
