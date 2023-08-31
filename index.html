@@ -2,134 +2,116 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Video.js | HTML5 Video Player</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video.js | HTML5 Video Player</title>
 
-	<link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
-	<script src="http://vjs.zencdn.net/4.12/video.js"></script>
-	
-	<link href="./build/videojs-snapshot.css" rel="stylesheet" type="text/css" />
-	<script src="./build/videojs-snapshot.js"></script>
-	<script src="./noUiSlider-15.7.1/dist/nouislider.js"></script>
-	<link rel="stylesheet" href="./noUiSlider-15.7.1/dist/nouislider.css">
-	<script src="gif.js-master/dist/gif.js"></script>
+    <link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+    <script src="http://vjs.zencdn.net/4.12/video.js"></script>
+    
+    <link href="./snapshot/videojs-snapshot.css" rel="stylesheet" type="text/css" />
+    <script src="./snapshot/videojs-snapshot.js"></script>
+    <script src="./noUiSlider-15.7.1/nouislider.js"></script>
+    <link rel="stylesheet" href="./noUiSlider-15.7.1/nouislider.css">
+    <script src="gif.js"></script>
 
-
-	<link href="styles.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
-	<div class="video-container">
-		<div id="video-background">
-			<p id="fpsDisplay">FPS will appear here!</p>
-			<video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls"
-				preload="auto" width="640" height="480">
-				<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
-					browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5
-						video</a></p>
-			</video>
-		</div>
-		<div>
-			<button id="exportButton" style="margin-top: 10px;margin-bottom: 10px;">Export as GIF</button>
-		</div>
-		<div id="extractButtonContainer" style="display: none;">
-			<button id="extractButton">Extract GIF</button>
-		</div>
+    <div id="loadingOverlay">
+        <div class="progress-container">
+            <progress id="progressBar" value="0" max="100"></progress>
+            <p id="progressBarText">Creating GIF, please wait...</p>
+        </div>
+    </div>
+    <div class="video-container">
+        <div id="video-background">
+            <p id="fpsDisplay">FPS will appear here!</p>
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls"
+                preload="auto" width="640" height="480">
+                <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
+                    browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5
+                        video</a></p>
+            </video>
+        </div>
+        <div>
+            <button class="blue-button buttons-controls" id="exportButton" style="margin-top: 10px;margin-bottom: 10px;">Export as GIF</button>
+        </div>
+        <div id="gif-selector" style="width: 100%;display: none;">
+            <div id="slider" style="margin-top: 50px;"></div>
+            <div class="frame-container">
+                <span class="example-val">
+                    Frame number: <input type="number" id="formatting-start">
+                </span>
+                <span class="example-val">
+                    Frame number: <input type="number" id="formatting-end">
+                </span>
+            </div>
+        </div>
+        <div id="extractButtonContainer" style="display: none;">
+            <button class="blue-button buttons-controls" id="extractButton">Extract GIF</button>
+            <button class="blue-button buttons-controls" id="cancelButton">Cancel</button>
+        </div>
+        <div id="properties"style="margin-top: 20px;">
+            <label for="looping">Looping: </label>
+            <select id="looping">
+              <option value="0">Off</option>
+              <option value="1">On</option>
+            </select>
+            <br>
+        
+            <label for="quality">Quality: </label>
+            <input type="number" id="quality" min="1" max="9">
+            <br>
+        
+            <label for="delay">Delay (microseconds): </label>
+            <input type="number" id="delay" min="1">
+            <br>
+        
+            <label for="resolution">GIF Resolution: </label>
+            <input type="number" id="resolutionWidth" min="1" placeholder="Width">
+            <input type="number" id="resolutionHeight" min="1" placeholder="Height">
+        </div>
+        <div class="button-container">
+            <div class="frame-skip skip-div">
+                <div class="frame-buttons">
+                    <button class="buttons-controls blue-button" onclick="forwardFrames(-1)">Frames Backward</button>
+                    <button class="buttons-controls blue-button" onclick="forwardFrames(1)">Frames Forward</button>
+                </div>
+                <div class="frame-selector selector" onmousemove="enableScroll(1)" onmouseleave="disableScroll()">
+                    <button class="blue-button" onclick="updateStep(-1)">&lt;</button>
+                    <span id="current-step">1</span>
+                    <button class="blue-button" onclick="updateStep(1)">&gt;</button>
+                    <span>&larr; Number of frames</span>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked id="switchSeconds">
+                <span class="slider round"></span>
+            </label>
+            <div class="seconds-skip skip-div">
+                <div class="seconds-buttons">
+                    <button class="buttons-controls blue-button" onclick="forwardSeconds(-1)">Seconds Backward</button>
+                    <button class="buttons-controls blue-button" onclick="forwardSeconds(1)">Seconds Forward</button>
+                </div>
+                <div class="seconds-selector selector" onmousemove="enableScroll(2)" onmouseleave="disableScroll()">
+                    <span>Number of seconds &rarr;</span>
+                    <button class="blue-button" onclick="updateSeconds(-1)">&lt;</button>
+                    <span id="current-seconds">1</span>
+                    <button class="blue-button" onclick="updateSeconds(1)">&gt;</button>
+                </div>
+            </div>
+        </div>
+        <div class="mp4-file-selector">
+            <p>Choose mp4 file:</p>
+            <input type="file" id="files" name="files[]" accept="video/mp4" />
+        </div>
+    </div>
 
-		<div id="gif-selector" style="width: 100%;display: none;">
-			
-			<div id="slider" style="margin-top: 50px;"></div>
-			<div class="frame-container">
-				<span class="example-val">
-					Frame number: <input type="number" id="formatting-start" >
-				</span>
-				<span class="example-val" >
-					Frame number: <input type="number" id="formatting-end">
-				</span>
-			</div>
-		</div>
-
-		<div id="properties"style="margin-top: 20px;">
-			<label for="looping">Looping: </label>
-			<select id="looping">
-			  <option value="0">Off</option>
-			  <option value="1">On</option>
-			</select>
-			<br>
-		
-			<label for="quality">Quality: </label>
-			<input type="number" id="quality" min="1" max="9">
-			<br>
-		
-			<label for="delay">Delay (microseconds): </label>
-			<input type="number" id="delay" min="1">
-			<br>
-		
-			<label for="resolution">GIF Resolution: </label>
-			<input type="number" id="resolutionWidth" min="1" placeholder="Width">
-			<input type="number" id="resolutionHeight" min="1" placeholder="Height">
-	
-		  </div>
-
-		<div class="button-container">
-			<div class="frame-skip skip-div">
-
-				<div class="frame-buttons">
-					<button class="buttons-controls" onclick="forwardFrames(1)">Frames Backward</button>
-					<button class="buttons-controls" onclick="forwardFrames(1)">Frames Forward</button>
-				</div>
-
-				<div class="frame-selector selector" onmousemove="enableScroll(1)" onmouseleave="disableScroll()">
-
-					<button onclick="updateStep(-1)">&lt;</button>
-					<span id="current-step">1</span>
-					<button onclick="updateStep(1)">&gt;</button>
-
-					<span>&larr; Number of frames</span>
-				</div>
-			</div>
-
-			<label class="switch">
-				<input type="checkbox" checked id="switchSeconds">
-				<span class="slider round"></span>
-			</label>
-
-			<div class="seconds-skip skip-div">
-
-				<div class="seconds-buttons">
-					<button class="buttons-controls" onclick="forwardSeconds(-1)">Seconds Backward</button>
-					<button class="buttons-controls" onclick="forwardSeconds(1)">Seconds Forward</button>
-				</div>
-
-				<div class="seconds-selector selector" onmousemove="enableScroll(2)" onmouseleave="disableScroll()">
-
-					<span>Number of seconds &rarr;</span>
-
-					<button onclick="updateSeconds(-1)">&lt;</button>
-					<span id="current-seconds">1</span>
-					<button onclick="updateSeconds(1)">&gt;</button>
-				</div>
-			</div>
-		</div>
-		<div class="mp4-file-selector">
-			<p>Choose mp4 file:</p>
-			<input type="file" id="files" name="files[]" accept="video/mp4" />
-		</div>
-	</div>
-
-	<script>
-		var player = videojs('my-video');
-		var fps;
-		var video = player.el().querySelector('video');
-
-		player.snapshot();
-	</script>
-	<script src="calculatefps.js"></script>
-	<script src="gifexport.js"></script>
 	<script src="javascript.js"></script>
-
-
+    <script src="calculatefps.js"></script>
+    <script src="gifexport.js"></script>
 </body>
 
 </html>

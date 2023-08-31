@@ -4,6 +4,12 @@
  * and handling key events for playback control and settings toggling.
  */
 
+var player = videojs('my-video');
+var fps;
+var video = player.el().querySelector('video');
+player.snapshot();
+enableDisableControls(true);
+document.getElementById("files").disabled = false;
 var currentStep = 1;
 var currentSeconds = 1;
 
@@ -37,6 +43,7 @@ function updateStep(step) {
 
 // Function to forward or backward seconds
 function forwardSeconds(direction) {
+    player.play();
     player.pause();
     var currentTime = player.currentTime();
     var newTime = currentTime + currentSeconds * direction;
@@ -58,6 +65,8 @@ document.getElementById('files').addEventListener('change', function (event) {
 
     // When changing the file init the fps calculation
     init_calculation();
+    enableDisableControls(false);
+
 }, false);
 
 // Function to enable scroll-based interaction
@@ -147,3 +156,11 @@ document.addEventListener('keydown', function (event) {
         switchSeconds.checked = bUpdateSeconds;
     }
 });
+function enableDisableControls(value) {
+    var buttons = document.querySelectorAll(".buttons-controls");
+    buttons.forEach(function (button) {
+        button.disabled = value;
+    });
+    document.getElementById("files").disabled = value;
+}
+

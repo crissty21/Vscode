@@ -4,16 +4,18 @@
 
 /**
  * to do:
- * add prop for gif export in html such as delay, looping, bitrate, workers, width and height, speed at of frame capture 
- * open gif in new window and save it from there 
  * clean up the gif.js master
- * style for buttons 
  */
 const formatSlider = document.getElementById('slider');
 const exportButton = document.getElementById("exportButton");
+const cancelButton = document.getElementById("cancelButton");
 const gifSelectorDiv = document.getElementById("gif-selector");
 const formattingStart = document.getElementById('formatting-start');
 const formattingEnd = document.getElementById('formatting-end');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const progressBar = document.getElementById('progressBar');
+const progressBarText = document.getElementById('progressBarText');
+
 // Keep track of the button state
 let isExtractButtonVisible = false;
 let draggingSlider = true;
@@ -24,7 +26,7 @@ var formatValues = [
   formattingEnd
 ];
 
-var handles; 
+var handles;
 
 formattingStart.addEventListener('input', handleStartFrameInputChange);
 formattingEnd.addEventListener('input', handleEndFrameInputChange);
@@ -52,30 +54,26 @@ var formatForSlider = {
 // Add click event listener to the export button
 exportButton.addEventListener("click", function () {
   showExtractButton();
-
+  player.play();
+  player.pause();
   // Toggle the visibility of the gif-selector div
-  if (gifSelectorDiv.style.display === "none") {
-    gifSelectorDiv.style.display = "block";
-    resolutionHeightInput.value = video.videoHeight;
-    resolutionWidthInput.value = video.videoWidth;
-    createSlider();
-    enableDisableControls(true);
-  } else {
-    gifSelectorDiv.style.display = "none";
-    destroySlider();
-    enableDisableControls(false);
-  }
+  gifSelectorDiv.style.display = "block";
+  resolutionHeightInput.value = video.videoHeight;
+  resolutionWidthInput.value = video.videoWidth;
+  createSlider();
+  exportButton.style.display = "none";
+
 });
 
-// Function to enable or disable various controls
-function enableDisableControls(value) {
-  var buttons = document.querySelectorAll(".buttons-controls");
-  buttons.forEach(function (button) {
-    button.disabled = value;
-  });
-  var fileInput = document.getElementById("files");
-  fileInput.disabled = value;
-}
+cancelButton.addEventListener("click", function () {
+  gifSelectorDiv.style.display = "none";
+  destroySlider();
+  enableDisableControls(false);
+  exportButton.style.display = "block";
+  showExtractButton();
+
+})
+
 
 // Function to destroy the slider
 function destroySlider() {
@@ -86,6 +84,7 @@ function destroySlider() {
 
 // Function to create the slider
 function createSlider() {
+
   resolutionWidthInput.max = video.videoWidth;
   resolutionHeightInput.max = video.videoHeight;
 
@@ -108,8 +107,7 @@ function createSlider() {
   formatSlider.noUiSlider.set([player.currentTime(), player.duration()]);
 
   formatSlider.noUiSlider.on('update', function (values, handle, unencoded) {
-    if(draggingSlider)
-    {
+    if (draggingSlider) {
       startTime = unencoded[0];
       endTime = unencoded[1];
       formatValues[handle].value = Math.floor(unencoded[handle] * fps);
@@ -119,15 +117,15 @@ function createSlider() {
 
   handles = slider.querySelectorAll('.noUi-handle');
 
-// Attach a click event listener to each handle
-handles.forEach(handle => {
+  // Attach a click event listener to each handle
+  handles.forEach(handle => {
     handle.addEventListener('mousedown', handleClick);
-});
+  });
 
-// Event handler for handle click
-function handleClick(event) {
+  // Event handler for handle click
+  function handleClick(event) {
     draggingSlider = true;
-}
+  }
 
 }
 
@@ -138,6 +136,12 @@ document.getElementById('extractButton').addEventListener('click', function () {
     quality: qualityInput.value,
     looping: loopingSelect.value
   });
+
+  // Show the loading overlay
+  loadingOverlay.style.display = 'block';
+  // Simulate GIF creation progress
+  let totalTime = endTime - startTime;
+  progressBarText.innerHTML = "Creating GIF, please wait...";
 
   player.currentTime(startTime);
 
@@ -151,7 +155,13 @@ document.getElementById('extractButton').addEventListener('click', function () {
       gif.addFrame(canvas, { delay: delayInput.value }); // You can adjust the delay as needed
       player.currentTime(player.currentTime() + delayInput.value / 1000); // Capture frames every 0.2 seconds
       setTimeout(captureFrame, 100);
+
+      // Update progress bar
+      progressBar.value = 100 - ((endTime - player.currentTime()) / totalTime) * 100;
+
+
     } else {
+      progressBarText.innerHTML = "The GIF is being rendered, please wait!<br>This might take a while...";
       gif.render();
     }
   }
@@ -159,13 +169,10 @@ document.getElementById('extractButton').addEventListener('click', function () {
   captureFrame();
 
   gif.on('finished', function (blob) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'output.gif';
-    a.textContent = 'Download GIF';
-    document.body.appendChild(a);
     window.open(URL.createObjectURL(blob));
+
+    // After the GIF is created or when the process is done, hide the overlay
+    loadingOverlay.style.display = 'none';
   });
 });
 
@@ -198,7 +205,7 @@ function handleStartFrameInputChange(event) {
   formattingStart.value = newValue;
 
   formatSlider.noUiSlider.set([(newValue / fps).toFixed(1), (formattingEnd.value / fps).toFixed(1)]);
-  
+
 }
 
 function handleEndFrameInputChange(event) {
@@ -211,7 +218,7 @@ function handleEndFrameInputChange(event) {
   var newValue = parseInt(inputElement.value);
 
   if (newValue <= parseInt(formattingStart.value)) {
-    formattingEnd.value = formattingStart.value+1;
+    formattingEnd.value = formattingStart.value + 1;
     newValue = formattingStart.value;
 
   }

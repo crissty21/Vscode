@@ -41,15 +41,7 @@ function snapshot() {
 	container.on('mouseup', finish);
 	container.on('mouseleave', finish);
 
-	function enableDisableControls(value) {
-		var buttons = document.querySelectorAll(".buttons-controls");
-		buttons.forEach(function (button) {
-			button.disabled = value;
-		});
-		var fileInput = document.getElementById("files");
-		fileInput.disabled = value;
-
-	}
+	
 	// Function to initialize the snapshot mode
 	function snap() {
 		enableDisableControls(true); // Disable controls
