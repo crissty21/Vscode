@@ -164,3 +164,27 @@ function enableDisableControls(value) {
     document.getElementById("files").disabled = value;
 }
 
+// Delay opening the tooltip text by 1 second for each question mark
+const questionMarks = document.querySelectorAll('.tooltip');
+const tooltipTimeouts = new Map();
+
+questionMarks.forEach((questionMark, index) => {
+
+    questionMark.addEventListener('mouseenter', () => {
+        tooltipTimeouts.set(index, setTimeout(() => {
+            let id = questionMark.id + "-text";
+            let tooltipText = document.getElementById(id);
+            tooltipText.style.visibility = 'visible';
+            tooltipText.style.opacity = '1';
+
+        }, 1000)); // 1000 milliseconds (1 second)
+    });
+
+    questionMark.addEventListener('mouseleave', () => {
+        clearTimeout(tooltipTimeouts.get(index));
+        let id = questionMark.id + "-text";
+        let tooltipText = document.getElementById(id);
+        tooltipText.style.visibility = 'hidden';
+        tooltipText.style.opacity = '0';
+    });
+});

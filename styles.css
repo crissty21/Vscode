@@ -279,3 +279,58 @@ select, input[type="number"] {
     background-color: #0056b3;
 }
 
+/* Styling for the circular reset button */
+#resetButton {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background-color: #007BFF;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#resetButton:hover {
+    background-color: #0056b3;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px; /* Adjust the margin as needed */
+}
+
+.question-mark {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ccc; /* Grey circle background color */
+    color: #fff;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 150px;
+    background-color: rgba(51, 51, 51, 0.904);
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+
