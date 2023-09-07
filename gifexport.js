@@ -43,6 +43,8 @@ delayInput.value = 30;
 
 // Add click event listener to the export button
 exportButton.addEventListener("click", function () {
+  canSnapshot = false;
+  alert(canSnapshot);
   showExtractButton();
   player.play();
   player.pause();
@@ -56,6 +58,7 @@ exportButton.addEventListener("click", function () {
 });
 
 cancelButton.addEventListener("click", function () {
+  canSnapshot = true;
   gifSelectorDiv.style.display = "none";
   destroySlider();
   enableDisableControls(false);

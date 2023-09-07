@@ -1,6 +1,7 @@
 // This file takes care of the snapshot functionality, including the drawing tools
-
+var canSnapshot = true;
 function snapshot() {
+	
 	var player = this; // Reference to the Video.js player instance
 	var container, scale; // Variables for canvas container and scaling
 	var tool = 'brush'; // Default drawing tool is the brush
@@ -44,6 +45,10 @@ function snapshot() {
 	
 	// Function to initialize the snapshot mode
 	function snap() {
+		if (!canSnapshot) {
+			alert("Can't take a snapshot while in Gif export Mode!");
+			return;
+		}
 		enableDisableControls(true); // Disable controls
 		player.pause(); 
 		player.el().blur(); 
