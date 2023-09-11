@@ -15,9 +15,10 @@ const qualityInput = document.getElementById('quality');
 const delayInput = document.getElementById('delay');
 const resolutionWidthInput = document.getElementById('resolutionWidth');
 const resolutionHeightInput = document.getElementById('resolutionHeight');
+const downloadButton = document.getElementById('downloadButton');
 //const loopingSelect = document.getElementById('looping');
 const resetButon = document.getElementById('resetButton');
-
+const downloadLink = document.createElement('a');
 let isExtractButtonVisible = false;
 let draggingSlider = true;
 let startTime = 0;
@@ -34,13 +35,14 @@ let formatForSlider = {
   }
 };
 
-formattingStart.addEventListener('input', handleStartFrameInputChange);
-formattingEnd.addEventListener('input', handleEndFrameInputChange);
+formattingStart.addEventListener('change', handleStartFrameInputChange);
+formattingEnd.addEventListener('change', handleEndFrameInputChange);
 
 qualityInput.value = 5;
 delayInput.value = 30;
 //loopingSelect.value = 0;
-
+downloadButton.style.display = "none";
+downloadLink.style.display = 'none';
 // Add click event listener to the export button
 exportButton.addEventListener("click", function () {
   canSnapshot = false;
@@ -64,7 +66,7 @@ cancelButton.addEventListener("click", function () {
   enableDisableControls(false);
   exportButton.style.display = "block";
   showExtractButton();
-
+  downloadButton.style.display='none';
 });
 
 resetButon.addEventListener('click', function () {
@@ -115,6 +117,7 @@ function createSlider() {
       startTime = unencoded[0];
       endTime = unencoded[1];
       formatValues[handle].value = Math.floor(unencoded[handle] * fps);
+      alert(startTime);
       player.currentTime(unencoded[handle]);
     }
   });
@@ -155,6 +158,7 @@ function handleStartFrameInputChange(event) {
 
   formattingStart.value = newValue;
   formatSlider.noUiSlider.set([(newValue / fps).toFixed(1), (formattingEnd.value / fps).toFixed(1)]);
+  startTime = (newValue / fps).toFixed(1);
 }
 
 function handleEndFrameInputChange(event) {
@@ -167,10 +171,11 @@ function handleEndFrameInputChange(event) {
   let newValue = parseInt(inputElement.value);
 
   if (newValue <= parseInt(formattingStart.value)) {
-    formattingEnd.value = formattingStart.value + 1;
+    formattingEnd.value = parseInt(formattingStart.value) + 1;
     newValue = formattingStart.value;
   }
   formatSlider.noUiSlider.set([(formattingStart.value / fps).toFixed(1), (newValue / fps).toFixed(1)]);
+  endTime = (newValue / fps).toFixed(1);
 }
 
 
@@ -215,11 +220,21 @@ document.getElementById('extractButton').addEventListener('click', function () {
   });
 
   gif.on('finished', function (blob) {
-    window.open(URL.createObjectURL(blob));
+    const currentDateTime = new Date();
+    const timestamp = currentDateTime.toISOString().replace(/[-T:.Z]/g, '');
+    const filename = `generated_at_${timestamp}.gif`;
+    const url = URL.createObjectURL(blob);
+    window.open(url);
     loadingOverlay.style.display = 'none';
+    downloadButton.style.display = 'block';
+    downloadLink.href = url;
+    downloadLink.download = filename; 
+    
   });
 });
 
-
-
-
+downloadButton.addEventListener('click', ()=>{
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+});
