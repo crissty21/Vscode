@@ -46,7 +46,6 @@ downloadLink.style.display = 'none';
 // Add click event listener to the export button
 exportButton.addEventListener("click", function () {
   canSnapshot = false;
-  alert(canSnapshot);
   showExtractButton();
   player.play();
   player.pause();
@@ -117,7 +116,6 @@ function createSlider() {
       startTime = unencoded[0];
       endTime = unencoded[1];
       formatValues[handle].value = Math.floor(unencoded[handle] * fps);
-      alert(startTime);
       player.currentTime(unencoded[handle]);
     }
   });

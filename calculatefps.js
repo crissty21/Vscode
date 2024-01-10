@@ -37,7 +37,6 @@ function ticker(useless, metadata) {
 
         // Calculate and display the rounded FPS along with certainty
         fps = Math.round(1 / get_fps_average());
-        document.getElementById("fpsDisplay").textContent = "FPS: " + fps;
     }
 
     // Reset the seeked flag and update previous media time and frame number

@@ -20,8 +20,7 @@ function ticker(useless, metadata) {
     ) {
         fps_rounder.push(diff);
         fps = Math.round(1 / get_fps_average());
-        document.getElementById("fpsDisplay").textContent = "FPS: " + fps + ", certainty: " + fps_rounder.length * 2 + "%";
-    }
+        }
     frame_not_seeked = true;
     last_media_time = metadata.mediaTime;
     last_frame_num = metadata.presentedFrames;

@@ -1,13 +1,6 @@
-.video-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f0f0f0;
-    padding: 20px 50px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 0 auto;
+body {
+    background-color: #F0F0F0;
+    font-family: Arial, sans-serif;
 }
 
 #video-background {
@@ -15,19 +8,11 @@
     border: 5px solid #007BFF;
     border-radius: 10px;
     margin-bottom: 5px;
+    width: 97vw; 
+    height: 54.5625vw; 
+    max-height: 80vh;
 }
 
-.button-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #f6f6f6;
-    border-radius: 5px;
-    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.1);
-    margin-top: 5px;
-    padding: 0px 5px;
-}
 
 .blue-button{
     padding: 10px 20px;
@@ -118,36 +103,6 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
-
-
-.skip-div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-.mp4-file-selector {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px auto;
-    max-width: 400px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f6f6f6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.mp4-file-selector p {
-    font-size: 16px;
-    margin: 10px 0;
-}
-
-
 .mp4-file-selector input[type="file"] {
     padding: 10px;
     border: 1px solid #ccc;
@@ -160,24 +115,9 @@ input:checked+.slider:before {
     max-width: 300px;
 }
 
-
 button[disabled] {
     background-color: #ccc;
     color: #888;
-}
-
-body {
-    font-family: Arial, sans-serif;
-}
-
-/* Style for the properties container */
-#properties {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f5f5f5;
-    display: none;
 }
 
 /* Style for labels and inputs */
@@ -193,14 +133,6 @@ select, input[type="number"] {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
-}
-.frame-container {
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .example-val {
@@ -261,7 +193,6 @@ select, input[type="number"] {
 .progress-container p {
     color: rgba(255, 242, 242, 0.757);
 }
-
 
 #blue-button {
     padding: 10px 20px;
@@ -333,4 +264,27 @@ select, input[type="number"] {
     transition: opacity 0.3s;
 }
 
+/* Style for the properties container */
+#properties {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    display: none;
+    
+}
+.button-container {
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f6f6f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button-container p {
+    font-size: 16px;
+    margin: 5px 0;
+}
 

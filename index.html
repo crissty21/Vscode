@@ -8,7 +8,7 @@
 
     <link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
     <script src="http://vjs.zencdn.net/4.12/video.js"></script>
-    
+
     <link href="./snapshot/videojs-snapshot.css" rel="stylesheet" type="text/css" />
     <script src="./snapshot/videojs-snapshot.js"></script>
     <script src="./noUiSlider-15.7.1/nouislider.js"></script>
@@ -25,107 +25,95 @@
             <p id="progressBarText">Creating GIF, please wait...</p>
         </div>
     </div>
-    <div class="video-container">
-        <div id="video-background">
-            <p id="fpsDisplay">FPS will appear here!</p>
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls"
-                preload="auto" width="640" height="480">
-                <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
-                    browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5
-                        video</a></p>
-            </video>
-        </div>
-        <div>
-            <button class="blue-button buttons-controls" id="exportButton" style="margin-top: 10px;margin-bottom: 10px;">Export as GIF</button>
-        </div>
-        <div id="gif-selector" style="width: 100%;display: none;">
-            <div id="slider" style="margin-top: 50px;"></div>
-            <div class="frame-container">
-                <span class="example-val">
-                    Frame number: <input type="number" id="formatting-start">
-                </span>
-                <span class="example-val">
-                    Frame number: <input type="number" id="formatting-end">
-                </span>
-            </div>
-        </div>
-        <div id="extractButtonContainer" style="display: none;">
-            <button class="blue-button buttons-controls" id="extractButton">Extract GIF</button>
-            <button class="blue-button buttons-controls" id="cancelButton">Cancel</button>
-        </div>
-        <div id="properties"style="margin-top: 20px;">
-            <!--
-                <-- Not working like intended 
-                <label for="looping">Looping: </label>
-                <select id="looping">
-                    <option value="0">Off</option>
-                    <option value="1">On</option>
-                </select>
-                <br>
-            --> 
-                
-            <label for="quality">Quality: </label>
-            <input type="number" id="quality" min="1" max="30">
-            <span class="tooltip-container">
-                <span class="tooltip question-mark" id="tooltip-1">?</span>
-                <span class="tooltip-text" id="tooltip-1-text">1 = best quality and slowest creation speed</span>
-            </span>
-            <br>
-        
-            <label for="delay">Delay (frames): </label>
-            <input type="number" id="delay" min="1">
-            <br>
-        
-            <label for="resolution">GIF Resolution: </label>
-            <input type="number" id="resolutionWidth" min="100" placeholder="Width">
-            <input type="number" id="resolutionHeight" min="100" placeholder="Height">
-            <button id="resetButton">&#8634;</button>
+    
+    <div id="video-background">
+        <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls" preload="auto"
+            width="100%" height="100%">
+            <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web
+                browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5
+                    video</a></p>
+        </video>
+    </div>
+    
+    <div id="properties" style="margin-top: 20px;">
 
-            
-        </div>
+        <label for="quality">Quality: </label>
+        <input type="number" id="quality" min="1" max="30">
+        <span class="tooltip-container">
+            <span class="tooltip question-mark" id="tooltip-1">?</span>
+            <span class="tooltip-text" id="tooltip-1-text">1 = best quality and slowest creation speed</span>
+        </span>
         <br>
-        <button id="downloadButton" class="blue-button" >Download GIF</button>
-        <div class="button-container">
-            <div class="frame-skip skip-div">
-                <div class="frame-buttons">
-                    <button class="buttons-controls blue-button" onclick="forwardFrames(-1)">Frames Backward</button>
-                    <button class="buttons-controls blue-button" onclick="forwardFrames(1)">Frames Forward</button>
-                </div>
-                <div class="frame-selector selector" onmousemove="enableScroll(1)" onmouseleave="disableScroll()">
-                    <button class="blue-button" onclick="updateStep(-1)">&lt;</button>
-                    <span id="current-step">1</span>
-                    <button class="blue-button" onclick="updateStep(1)">&gt;</button>
-                    <span>&larr; Number of frames</span>
-                </div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" checked id="switchSeconds">
-                <span class="tooltip slider round"id="tooltip-2"></span>
-                <br><br>
-                <span class="tooltip-container">
-                    <span class="tooltip-text"id="tooltip-2-text">switch between frames and seconds (s)</span>
-                </span>
-            </label>
-            <div class="seconds-skip skip-div">
-                <div class="seconds-buttons">
-                    <button class="buttons-controls blue-button" onclick="forwardSeconds(-1)">Seconds Backward</button>
-                    <button class="buttons-controls blue-button" onclick="forwardSeconds(1)">Seconds Forward</button>
-                </div>
-                <div class="seconds-selector selector" onmousemove="enableScroll(2)" onmouseleave="disableScroll()">
-                    <span>Number of seconds &rarr;</span>
-                    <button class="blue-button" onclick="updateSeconds(-1)">&lt;</button>
-                    <span id="current-seconds">1</span>
-                    <button class="blue-button" onclick="updateSeconds(1)">&gt;</button>
+
+        <label for="delay">Delay (frames): </label>
+        <input type="number" id="delay" min="1">
+        <br>
+
+        <label for="resolution">GIF Resolution: </label>
+        <input type="number" id="resolutionWidth" min="100" placeholder="Width">
+        <input type="number" id="resolutionHeight" min="100" placeholder="Height">
+        <button id="resetButton">&#8634;</button>
+
+
+    </div>
+    <br>
+    <button id="downloadButton" class="blue-button">Download GIF</button>
+    <div class="button-container" style="display: flex;">
+        <div>
+            <div>
+                <p>Skip frames</p>
+                <div style="display: flex; justify-content: space-between;">
+                    <button class="blue-button" onclick="forwardFrames(-1)">&larr;</button>
+                    <input id="current-step" type="number" min="0" max="30">
+                    <button class="blue-button" onclick="forwardFrames(1)">&rarr;</button>
                 </div>
             </div>
         </div>
-        <div class="mp4-file-selector">
-            <p>Choose mp4 file:</p>
-            <input type="file" id="files" name="files[]" accept="video/mp4" />
+        <label class="switch">
+            <input type="checkbox" checked id="switchSeconds">
+            <span class="tooltip slider round" id="tooltip-2"></span>
+            <br><br>
+            <span class="tooltip-container">
+                <span class="tooltip-text" id="tooltip-2-text">switch between frames and seconds (s)</span>
+            </span>
+        </label>
+        <div>
+            <div>
+                <p>Skip seconds</p>
+                <div style="display: flex; justify-content: space-between;">
+                    <button class="blue-button" onclick="forwardSeconds(-1)">&larr;</button>
+                    <input id="current-step" type="number" min="0" max="30">
+                    <button class="blue-button" onclick="forwardSeconds(1)">&rarr;</button>
+                </div>
+            </div>
         </div>
     </div>
+    <div>
+        <button class="blue-button buttons-controls" id="exportButton"
+            style="margin-top: 10px;margin-bottom: 10px;">Export as GIF</button>
+    </div>
+    <div id="gif-selector" style="width: 100%;display: none;">
+        <div id="slider" style="margin-top: 50px;"></div>
+        <div class="frame-container">
+            <span class="example-val">
+                Frame number: <input type="number" id="formatting-start">
+            </span>
+            <span class="example-val">
+                Frame number: <input type="number" id="formatting-end">
+            </span>
+        </div>
+    </div>
+    <div id="extractButtonContainer" style="display: none;">
+        <button class="blue-button buttons-controls" id="extractButton">Extract GIF</button>
+        <button class="blue-button buttons-controls" id="cancelButton">Cancel</button>
+    </div>
+    <div class="button-container">
+        <p>Choose mp4 file:</p>
+        <input type="file" id="files" name="files[]" accept="video/mp4" />
+    </div>
+    </div>
 
-	<script src="video-playback-controlls.js"></script>
+    <script src="video-playback-controlls.js"></script>
     <script src="calculatefps.js"></script>
     <script src="gifexport.js"></script>
 </body>
