@@ -31,6 +31,12 @@ document.getElementById('current-step').addEventListener('input', function (e) {
     currentStep = parseInt(e.target.value);
 });
 
+function modifyVideoHeight(newHeight) {
+    var videoDiv = document.getElementById("video-background");
+    videoDiv.style.transition = "height 0.8s";
+    videoDiv.style.height = newHeight;
+    
+}
 
 // Function to forward or backward frames
 function forwardFrames(direction) {
@@ -72,7 +78,7 @@ document.getElementById('files').addEventListener('change', function (event) {
 
     // When changing the file init the fps calculation
     init_calculation();
-
+    modifyVideoHeight("88vh");
 }, false);
 
 // Event listener for keydown events
@@ -147,6 +153,7 @@ document.addEventListener('keydown', function (event) {
         switchSeconds.checked = bUpdateSeconds;
     }
 });
+
 function enableDisableControls(value) {
     var buttons = document.querySelectorAll(".buttons-controls");
     buttons.forEach(function (button) {
