@@ -3,6 +3,10 @@
  * It provides functionality for stepping through frames or seconds, enabling scroll-based interaction,
  * and handling key events for playback control and settings toggling.
  */
+var videoPlayerDim1 = "88vh";
+var videoPlayerDim2 = "96vh";
+var videoPlayerDim3 = "83.5vh";
+
 
 var player = videojs('my-video');
 var fps;
@@ -78,7 +82,7 @@ document.getElementById('files').addEventListener('change', function (event) {
 
     // When changing the file init the fps calculation
     init_calculation();
-    modifyVideoHeight("88vh");
+    modifyVideoHeight(videoPlayerDim1);
 }, false);
 
 // Event listener for keydown events

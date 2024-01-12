@@ -49,6 +49,7 @@ function snapshot() {
 			alert("Can't take a snapshot while in Gif export Mode!");
 			return;
 		}
+		modifyVideoHeight(videoPlayerDim2)
 		enableDisableControls(true); // Disable controls
 		player.pause(); 
 		player.el().blur(); 
@@ -616,6 +617,7 @@ function snapshot() {
 
 			// Enable player controls
 			enableDisableControls(false);
+			modifyVideoHeight(videoPlayerDim1);
 		});
 	}
 
