@@ -62,5 +62,6 @@ function init_calculation()
 }
 
 function get_fps_average() {
+    enableDisableControls(false)
     return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
 }

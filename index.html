@@ -25,7 +25,7 @@
             <p id="progressBarText">Creating GIF, please wait...</p>
         </div>
     </div>
-    
+
     <div id="video-background">
         <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls="controls" preload="auto"
             width="100%" height="100%">
@@ -34,78 +34,82 @@
                     video</a></p>
         </video>
     </div>
-    
-    <div id="properties" style="margin-top: 20px;">
 
-        <label for="quality">Quality: </label>
-        <input type="number" id="quality" min="1" max="30">
-        <span class="tooltip-container">
-            <span class="tooltip question-mark" id="tooltip-1">?</span>
-            <span class="tooltip-text" id="tooltip-1-text">1 = best quality and slowest creation speed</span>
-        </span>
-        <br>
-
-        <label for="delay">Delay (frames): </label>
-        <input type="number" id="delay" min="1">
-        <br>
-
-        <label for="resolution">GIF Resolution: </label>
-        <input type="number" id="resolutionWidth" min="100" placeholder="Width">
-        <input type="number" id="resolutionHeight" min="100" placeholder="Height">
-        <button id="resetButton">&#8634;</button>
-
-
-    </div>
-    <br>
-    <button id="downloadButton" class="blue-button">Download GIF</button>
-    <div class="button-container" style="display: flex;">
-        <div>
+    <div id="properties">
+        <div id="gif-selector">
+            <div class="frame-container">
+                <span class="example-val">
+                    Start frame number: <input type="number" id="formatting-start">
+                </span>
+                <span style="margin-right: 10px;margin-left: 10px;">-</span>
+                <span class="example-val">
+                    End frame number: <input type="number" id="formatting-end">
+                </span>
+            </div>
+            <div id="slider" style="margin-top: 50px;"></div>
+        </div>
+        <div style="display: flex;">
             <div>
-                <p>Skip frames</p>
-                <div style="display: flex; justify-content: space-between;">
-                    <button class="blue-button" onclick="forwardFrames(-1)">&larr;</button>
-                    <input id="current-step" type="number" min="0" max="30">
-                    <button class="blue-button" onclick="forwardFrames(1)">&rarr;</button>
+                <label for="quality">Quality: </label>
+                <input type="number" id="quality" min="1" max="30">
+                <span class="tooltip-container">
+                    <span class="tooltip question-mark" id="tooltip-1">?</span>
+                    <span class="tooltip-text" id="tooltip-1-text">1 = best quality and slowest creation speed</span>
+                </span>
+                <br>
+
+                <label for="delay">Delay (frames): </label>
+                <input type="number" id="delay" min="1">
+                <br>
+
+                <label for="resolution">GIF Resolution: </label>
+                <input type="number" id="resolutionWidth" min="100" placeholder="Width">
+                <input type="number" id="resolutionHeight" min="100" placeholder="Height">
+                <button id="resetButton">&#8634;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; margin-left: 20px;">
+                <div id="extractButtonContainer" style="display: none;">
+                    <button class="blue-button buttons-controls" id="extractButton">Extract GIF</button>
+                    <button class="blue-button buttons-controls" id="cancelButton">Cancel</button>
                 </div>
+                <button id="downloadButton" class="blue-button" style="margin-top: 5px;">Download GIF</button>
             </div>
         </div>
-        <label class="switch">
-            <input type="checkbox" checked id="switchSeconds">
-            <span class="tooltip slider round" id="tooltip-2"></span>
-            <br><br>
-            <span class="tooltip-container">
-                <span class="tooltip-text" id="tooltip-2-text">switch between frames and seconds (s)</span>
-            </span>
-        </label>
+
+    </div>
+    <div class="button-container" style="display: flex; align-items: center;">
+
         <div>
-            <div>
-                <p>Skip seconds</p>
-                <div style="display: flex; justify-content: space-between;">
-                    <button class="blue-button" onclick="forwardSeconds(-1)">&larr;</button>
-                    <input id="current-step" type="number" min="0" max="30">
-                    <button class="blue-button" onclick="forwardSeconds(1)">&rarr;</button>
-                </div>
+            <p>Skip frames</p>
+            <div style="display: flex; justify-content: space-between;">
+                <button class="blue-button buttons-controls" onclick="forwardFrames(-1)">&larr;</button>
+                <input id="current-step" type="number" min="1" value="1" style="margin-left: 5px; margin-right: 5px; text-align: center;">
+                <button class="blue-button buttons-controls" onclick="forwardFrames(1)">&rarr;</button>
             </div>
         </div>
-    </div>
-    <div>
-        <button class="blue-button buttons-controls" id="exportButton"
-            style="margin-top: 10px;margin-bottom: 10px;">Export as GIF</button>
-    </div>
-    <div id="gif-selector" style="width: 100%;display: none;">
-        <div id="slider" style="margin-top: 50px;"></div>
-        <div class="frame-container">
-            <span class="example-val">
-                Frame number: <input type="number" id="formatting-start">
-            </span>
-            <span class="example-val">
-                Frame number: <input type="number" id="formatting-end">
-            </span>
+        <div style=" margin-left: 20px; margin-right: 20px; text-align: center;">
+            <p style="margin-bottom: 10px;">Quick comands</p>
+            <label class="switch">
+                <input type="checkbox" checked id="switchSeconds">
+                <span class="tooltip slider round" id="tooltip-2"></span>
+                <span class="tooltip-container">
+                    <span class="tooltip-text" id="tooltip-2-text">key-shortcut: S</span>
+                </span>
+            </label>
         </div>
-    </div>
-    <div id="extractButtonContainer" style="display: none;">
-        <button class="blue-button buttons-controls" id="extractButton">Extract GIF</button>
-        <button class="blue-button buttons-controls" id="cancelButton">Cancel</button>
+
+        <div>
+            <p>Skip seconds</p>
+            <div style="display: flex; justify-content: space-between;">
+                <button class="blue-button buttons-controls" onclick="forwardSeconds(-1)">&larr;</button>
+                <input id="current-seconds" type="number" min="1" value="1" style="margin-left: 5px; margin-right: 5px; text-align: center;">
+                <button class="blue-button buttons-controls" onclick="forwardSeconds(1)">&rarr;</button>
+            </div>
+        </div>
+
+        <div>
+            <button class="blue-button buttons-controls" id="exportButton">Export as GIF</button>
+        </div>
     </div>
     <div class="button-container">
         <p>Choose mp4 file:</p>

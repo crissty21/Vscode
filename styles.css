@@ -8,13 +8,13 @@ body {
     border: 5px solid #007BFF;
     border-radius: 10px;
     margin-bottom: 5px;
-    width: 97vw; 
-    height: 54.5625vw; 
+    /*width: 97vw;*/
+    height: 55vw;
     max-height: 80vh;
 }
 
 
-.blue-button{
+.blue-button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -103,6 +103,7 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
 .mp4-file-selector input[type="file"] {
     padding: 10px;
     border: 1px solid #ccc;
@@ -128,7 +129,8 @@ label {
     text-align: right;
 }
 
-select, input[type="number"] {
+select,
+input[type="number"] {
     width: 80px;
     padding: 5px;
     border: 1px solid #ccc;
@@ -173,9 +175,15 @@ select, input[type="number"] {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
 .progress-container {
     display: flex;
     flex-direction: column;
@@ -190,6 +198,7 @@ select, input[type="number"] {
     z-index: 9999;
     text-align: center;
 }
+
 .progress-container p {
     color: rgba(255, 242, 242, 0.757);
 }
@@ -232,7 +241,8 @@ select, input[type="number"] {
 .tooltip-container {
     position: relative;
     display: inline-block;
-    margin-left: 10px; /* Adjust the margin as needed */
+    margin-left: 10px;
+    /* Adjust the margin as needed */
 }
 
 .question-mark {
@@ -240,7 +250,8 @@ select, input[type="number"] {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: #ccc; /* Grey circle background color */
+    background-color: #ccc;
+    /* Grey circle background color */
     color: #fff;
     text-align: center;
     line-height: 20px;
@@ -272,8 +283,9 @@ select, input[type="number"] {
     border-radius: 5px;
     background-color: #f5f5f5;
     display: none;
-    
+
 }
+
 .button-container {
     margin: 5px;
     padding: 10px;
@@ -288,3 +300,13 @@ select, input[type="number"] {
     margin: 5px 0;
 }
 
+#gif-selector {
+    display: none;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+#exportButton {
+    margin-left: 20px;
+}
