@@ -313,3 +313,11 @@ input[type="number"] {
 #exportButton {
     margin-left: 20px;
 }
+
+.noUi-connect {
+    background:  #3291f7;
+
+}
+.noUi-base {
+    background: #807d75;
+}

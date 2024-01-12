@@ -97,6 +97,7 @@ function createSlider() {
 
   noUiSlider.create(formatSlider, {
     start: ['20.0', '80.0'],
+    connect: [false,true,false],
     range: {
       'min': 0,
       'max': player.duration()
