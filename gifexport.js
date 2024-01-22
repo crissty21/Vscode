@@ -55,7 +55,7 @@ exportButton.addEventListener("click", function () {
   resolutionWidthInput.value = video.videoWidth;
   createSlider();
   exportButton.style.display = "none";
-  modifyVideoHeight(videoPlayerDim3);
+  modifyVideoHeight(3);
 });
 
 cancelButton.addEventListener("click", function () {
@@ -66,7 +66,7 @@ cancelButton.addEventListener("click", function () {
   exportButton.style.display = "block";
   showExtractButton();
   downloadButton.style.display='none';
-  modifyVideoHeight(videoPlayerDim1);
+  modifyVideoHeight(1);
 });
 
 resetButon.addEventListener('click', function () {

@@ -3,10 +3,9 @@
  * It provides functionality for stepping through frames or seconds, enabling scroll-based interaction,
  * and handling key events for playback control and settings toggling.
  */
-var videoPlayerDim1 = "88vh";
-var videoPlayerDim2 = "96vh";
-var videoPlayerDim3 = "83.5vh";
 
+var currentHeigth;
+var videoPlayerDim = [0,0,0,0];
 
 var player = videojs('my-video');
 var fps;
@@ -22,6 +21,45 @@ var canUseQuickCommands = false;
 var switchSeconds = document.getElementById("switchSeconds");
 var bUpdateSeconds = true;
 
+window.onload = function() {
+    var div1 = document.getElementById('video-background');
+    var div2 = document.getElementById('second-div');
+    var div3 = document.getElementById('third-div');
+
+   
+    var height2 = div2.offsetHeight;
+    var viewportHeight = window.innerHeight;
+    var height3 = div3.offsetHeight;
+
+    var height1 = viewportHeight - height2 - height3 - 30;
+    div1.style.height = height1 + 'px';
+    currentHeigth = 0;
+
+    function adjustHeights(){
+        viewportHeight = window.innerHeight;
+        videoPlayerDim[0] = (viewportHeight - height2 - height3 - 30) + 'px';
+        videoPlayerDim[1] = (viewportHeight - height2 - 30) + 'px';
+        videoPlayerDim[2] = (viewportHeight - 30) + 'px';
+        videoPlayerDim[3] = (viewportHeight - 150) + 'px';
+        modifyVideoHeight(currentHeigth)
+    }
+    
+    //videoPlayerDim3 = "83.5vh";
+    adjustHeights();
+    window.onresize = adjustHeights;
+
+    loadVideo();
+}   
+
+function loadVideo(){
+    // Obțineți parametrul video din URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var videoPath = urlParams.get('video');
+
+    player.src({type: 'video/mp4', src: videoPath});
+
+}
+
 // Event listener for toggling between updating seconds and steps
 switchSeconds.addEventListener('change', function () {
     bUpdateSeconds = switchSeconds.checked;
@@ -35,11 +73,12 @@ document.getElementById('current-step').addEventListener('input', function (e) {
     currentStep = parseInt(e.target.value);
 });
 
+
 function modifyVideoHeight(newHeight) {
     var videoDiv = document.getElementById("video-background");
     videoDiv.style.transition = "height 0.8s";
-    videoDiv.style.height = newHeight;
-    
+    videoDiv.style.height = videoPlayerDim[newHeight];
+    currentHeigth = newHeight;
 }
 
 // Function to forward or backward frames
@@ -82,7 +121,7 @@ document.getElementById('files').addEventListener('change', function (event) {
 
     // When changing the file init the fps calculation
     init_calculation();
-    modifyVideoHeight(videoPlayerDim1);
+    modifyVideoHeight(1);
 }, false);
 
 // Event listener for keydown events
