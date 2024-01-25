@@ -1,5 +1,1 @@
-You need to open it as a python server 
-you do this by:
-open cmd on this folder 
-run command: python -m http.server
-then in a browser go to: http://localhost:8000
+You just need to run server.py
