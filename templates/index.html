@@ -18,7 +18,7 @@
     <script src="{{url_for('static', filename='gif.js')}}"></script>
 
     <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
-    
+
 </head>
 
 <body>
@@ -86,7 +86,8 @@
             <p>Skip frames</p>
             <div style="display: flex; justify-content: space-between;">
                 <button class="blue-button buttons-controls" onclick="forwardFrames(-1)">&larr;</button>
-                <input id="current-step" type="number" min="1" value="1" style="margin-left: 5px; margin-right: 5px; text-align: center;">
+                <input id="current-step" type="number" min="1" value="1"
+                    style="margin-left: 5px; margin-right: 5px; text-align: center;">
                 <button class="blue-button buttons-controls" onclick="forwardFrames(1)">&rarr;</button>
             </div>
         </div>
@@ -105,7 +106,8 @@
             <p>Skip seconds</p>
             <div style="display: flex; justify-content: space-between;">
                 <button class="blue-button buttons-controls" onclick="forwardSeconds(-1)">&larr;</button>
-                <input id="current-seconds" type="number" min="1" value="1" style="margin-left: 5px; margin-right: 5px; text-align: center;">
+                <input id="current-seconds" type="number" min="1" value="1"
+                    style="margin-left: 5px; margin-right: 5px; text-align: center;">
                 <button class="blue-button buttons-controls" onclick="forwardSeconds(1)">&rarr;</button>
             </div>
         </div>
@@ -123,6 +125,10 @@
     <script src="{{url_for('static', filename='video-playback-controlls.js')}}"></script>
     <script src="{{url_for('static', filename='calculatefps.js')}}"></script>
     <script src="{{url_for('static', filename='gifexport.js')}}"></script>
+    <script>
+        
+
+    </script>
 </body>
 
 </html>

@@ -1,18 +1,24 @@
-# Server-side (Python + Flask)
-from flask import Flask, jsonify, render_template
-import os
-
+from flask import Flask, render_template, send_file, request
 app = Flask(__name__)
-@app.route("/")
+
+# Global variable to store the path to the video file
+video_path = ""
+
+@app.route('/')
 def index():
     return render_template("index.html")
 
-@app.route('/get-videos', methods=['GET'])
-def get_videos():
-    video_dir = 'C:\\Users\\crist\\Desktop\\Vscode\\testing\\videos'
-    files = os.listdir(video_dir)
-    mp4_files = [file for file in files if file.endswith('.mp4')]
-    return jsonify(mp4_files)
+@app.route('/video')
+def video():
+    return send_file(video_path, mimetype="video/mp4")
+
+# New route to receive the path to the video file from JavaScript
+@app.route('/set_video_path', methods=['POST'])
+def set_video_path():
+    global video_path
+    data = request.get_json()
+    video_path = data.get('path', '')
+    return 'OK'
 
 if __name__ == '__main__':
     app.run(debug=True)
