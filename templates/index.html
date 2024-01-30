@@ -116,19 +116,23 @@
             <button class="blue-button buttons-controls" id="exportButton">Export as GIF</button>
         </div>
     </div>
-    <div class="button-container" id="third-div">
-        <p>Choose mp4 file:</p>
-        <input type="file" id="files" name="files[]" accept="video/mp4" />
+    <div class="button-container" id="third-div" style="display: flex;">
+        <div>
+            <p>Choose mp4 file:</p>
+            <input type="file" id="files" name="files[]" accept="video/mp4" />
+        </div>
+        <div>
+            <p>Videos folder options:</p>
+            <select id="videoDropdown" style="width: auto;"></select>
+        </div>
     </div>
     </div>
+    
 
+    
     <script src="{{url_for('static', filename='video-playback-controlls.js')}}"></script>
     <script src="{{url_for('static', filename='calculatefps.js')}}"></script>
     <script src="{{url_for('static', filename='gifexport.js')}}"></script>
-    <script>
-        
-
-    </script>
 </body>
 
 </html>
