@@ -16,10 +16,12 @@ document.getElementById("files").disabled = false;
 var currentStep = 1;
 var currentSeconds = 1;
 var canUseQuickCommands = false;
+const dropdown = document.getElementById('videoDropdown');
 
 // Get the switch element for toggling between updating seconds and steps
 var switchSeconds = document.getElementById("switchSeconds");
 var bUpdateSeconds = true;
+
 
 window.onload = function() {
     var div1 = document.getElementById('video-background');
@@ -51,17 +53,33 @@ window.onload = function() {
     loadVideo();
 }   
 
-function loadVideo(){
+function loadVideo() {
     // Obțineți parametrul video din URL
     var urlParams = new URLSearchParams(window.location.search);
     var videoPath = urlParams.get('video');
 
-    player.src({type: 'video/mp4', src: videoPath});
-
+    if (videoPath) {
+        loadVideoFromPath(videoPath);
+    }
 }
 
+fetch('/get-videos')
+            .then(response => response.json())
+            .then(videos => {
+                videos.forEach(video => {
+                    const option = document.createElement('option');
+                    option.value = video;
+                    option.text = video;
+                    dropdown.add(option);
+                });
+            });
+
+dropdown.addEventListener('change', (event) => {
+    loadVideoFromPath("videos/" + event.target.value)
+});
+
 // Event listener for toggling between updating seconds and steps
-switchSeconds.addEventListener('change', function () {
+switchSeconds.addEventListener('select', function () {
     bUpdateSeconds = switchSeconds.checked;
 });
 
@@ -73,6 +91,41 @@ document.getElementById('current-step').addEventListener('input', function (e) {
     currentStep = parseInt(e.target.value);
 });
 
+
+function loadVideoFromPath(videoPath) {
+    sendPathToServer(videoPath);
+
+    // Function to send the path to the Flask server
+    function sendPathToServer(path) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "set_video_path", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+        // Send the path as JSON data
+        xhr.send(JSON.stringify({ path: path }));
+
+        // You can also add a handler for the server response if needed
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                console.log("Path to file sent successfully!");
+            } else {
+                console.error("Error sending the file path.");
+            }
+        };
+    }
+    
+    fetch('/video')
+    .then(response => response.blob())
+    .then(video => {
+        var url = URL.createObjectURL(video);
+        player.src({ type: "video/mp4", src: url });
+    })
+    .catch(error => console.error('A apărut o eroare:', error));
+    // Get the video element and set the source on page load
+    
+    init_calculation();
+    modifyVideoHeight(1);
+}
 
 function modifyVideoHeight(newHeight) {
     var videoDiv = document.getElementById("video-background");
