@@ -75,7 +75,7 @@ fetch('/get-videos')
             });
 
 dropdown.addEventListener('change', (event) => {
-    loadVideoFromPath("videos/" + event.target.value);
+    loadVideoFromPath("videos/" + event.target.value)
 });
 
 // Event listener for toggling between updating seconds and steps
@@ -114,10 +114,15 @@ function loadVideoFromPath(videoPath) {
         };
     }
     
-    
+    fetch('/video')
+    .then(response => response.blob())
+    .then(video => {
+        var url = URL.createObjectURL(video);
+        player.src({ type: "video/mp4", src: url });
+    })
+    .catch(error => console.error('A apărut o eroare:', error));
     // Get the video element and set the source on page load
-    player.src({ type: 'video/mp4', src: "" });
-    player.src({ type: 'video/mp4', src: "video" });
+    
     init_calculation();
     modifyVideoHeight(1);
 }
