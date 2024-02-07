@@ -8,7 +8,9 @@
 
     <link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
     <script src="http://vjs.zencdn.net/4.12/video.js"></script>
-
+    <!--
+        the strange src url is because of the flask server
+    -->
     <link href="{{url_for('static', filename='snapshot/videojs-snapshot.css')}} " rel="stylesheet" type="text/css" />
     <script src="{{url_for('static', filename='/snapshot/videojs-snapshot.js')}} "></script>
     <script src="{{url_for('static', filename='gif.worker.js')}} "></script>

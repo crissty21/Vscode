@@ -5,7 +5,7 @@
  */
 
 var currentHeigth;
-var videoPlayerDim = [0,0,0,0];
+var videoPlayerDim = [0, 0, 0, 0];
 
 var player = videojs('my-video');
 var fps;
@@ -23,12 +23,12 @@ var switchSeconds = document.getElementById("switchSeconds");
 var bUpdateSeconds = true;
 
 
-window.onload = function() {
+window.onload = function () {
     var div1 = document.getElementById('video-background');
     var div2 = document.getElementById('second-div');
     var div3 = document.getElementById('third-div');
 
-   
+
     var height2 = div2.offsetHeight;
     var viewportHeight = window.innerHeight;
     var height3 = div3.offsetHeight;
@@ -37,7 +37,7 @@ window.onload = function() {
     div1.style.height = height1 + 'px';
     currentHeigth = 0;
 
-    function adjustHeights(){
+    function adjustHeights() {
         viewportHeight = window.innerHeight;
         videoPlayerDim[0] = (viewportHeight - height2 - height3 - 30) + 'px';
         videoPlayerDim[1] = (viewportHeight - height2 - 30) + 'px';
@@ -45,16 +45,15 @@ window.onload = function() {
         videoPlayerDim[3] = (viewportHeight - 150) + 'px';
         modifyVideoHeight(currentHeigth)
     }
-    
-    //videoPlayerDim3 = "83.5vh";
+
     adjustHeights();
     window.onresize = adjustHeights;
 
     loadVideo();
-}   
+}
 
 function loadVideo() {
-    // Obțineți parametrul video din URL
+    // get url parameter from link
     var urlParams = new URLSearchParams(window.location.search);
     var videoPath = urlParams.get('video');
 
@@ -64,15 +63,55 @@ function loadVideo() {
 }
 
 fetch('/get-videos')
-            .then(response => response.json())
-            .then(videos => {
-                videos.forEach(video => {
-                    const option = document.createElement('option');
-                    option.value = video;
-                    option.text = video;
-                    dropdown.add(option);
-                });
-            });
+    .then(response => response.json())
+    .then(videos => {
+        videos.forEach(video => {
+            const option = document.createElement('option');
+            option.value = video;
+            option.text = video;
+            dropdown.add(option);
+        });
+    });
+
+function loadVideoFromPath(videoPath) {
+    sendPathToServer(videoPath);
+
+    function sendPathToServer(path) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "set_video_path", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+        // Send the path as JSON data
+        xhr.send(JSON.stringify({ path: path }));
+
+        //xhr.onload = function () {
+        //    if (xhr.status === 200) {
+        //        console.log("Path to file sent successfully!");
+        //    } else {
+        //        console.error("Error sending the file path.");
+        //    }
+        //};
+    }//
+
+    fetch('/video')
+        .then(response => response.blob())
+        .then(video => {
+            var url = URL.createObjectURL(video);
+            player.src({ type: "video/mp4", src: url });
+        })
+        .catch(error => console.error('An error ocured:', error));
+    // Get the video element and set the source on page load
+
+    init_calculation();
+    modifyVideoHeight(1);
+}
+
+function modifyVideoHeight(newHeight) {
+    var videoDiv = document.getElementById("video-background");
+    videoDiv.style.transition = "height 0.8s";
+    videoDiv.style.height = videoPlayerDim[newHeight];
+    currentHeigth = newHeight;
+}
 
 dropdown.addEventListener('change', (event) => {
     loadVideoFromPath("videos/" + event.target.value)
@@ -92,47 +131,6 @@ document.getElementById('current-step').addEventListener('input', function (e) {
 });
 
 
-function loadVideoFromPath(videoPath) {
-    sendPathToServer(videoPath);
-
-    // Function to send the path to the Flask server
-    function sendPathToServer(path) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "set_video_path", true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-        // Send the path as JSON data
-        xhr.send(JSON.stringify({ path: path }));
-
-        // You can also add a handler for the server response if needed
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                console.log("Path to file sent successfully!");
-            } else {
-                console.error("Error sending the file path.");
-            }
-        };
-    }
-    
-    fetch('/video')
-    .then(response => response.blob())
-    .then(video => {
-        var url = URL.createObjectURL(video);
-        player.src({ type: "video/mp4", src: url });
-    })
-    .catch(error => console.error('A apărut o eroare:', error));
-    // Get the video element and set the source on page load
-    
-    init_calculation();
-    modifyVideoHeight(1);
-}
-
-function modifyVideoHeight(newHeight) {
-    var videoDiv = document.getElementById("video-background");
-    videoDiv.style.transition = "height 0.8s";
-    videoDiv.style.height = videoPlayerDim[newHeight];
-    currentHeigth = newHeight;
-}
 
 // Function to forward or backward frames
 function forwardFrames(direction) {
@@ -167,7 +165,6 @@ function updateSeconds(step) {
     }
 }
 
-// Event listener for file input change
 document.getElementById('files').addEventListener('change', function (event) {
     var file = event.target.files[0];
     player.src({ type: "video/mp4", src: URL.createObjectURL(file) });
@@ -177,7 +174,7 @@ document.getElementById('files').addEventListener('change', function (event) {
     modifyVideoHeight(1);
 }, false);
 
-// Event listener for keydown events
+
 document.addEventListener('keydown', function (event) {
     // Play/pause video with spacebar
     if (canUseQuickCommands) {
